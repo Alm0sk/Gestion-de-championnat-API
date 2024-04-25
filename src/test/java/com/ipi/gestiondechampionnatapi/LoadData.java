@@ -4,6 +4,7 @@ import com.ipi.gestiondechampionnatapi.models.User;
 import com.ipi.gestiondechampionnatapi.repository.UserRepository;
 import org.junit.platform.commons.logging.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -12,8 +13,8 @@ import java.time.LocalDate;
 import java.util.logging.Logger;
 
 @Configuration
-public class UserControllerTest {
-    private final Logger log = (Logger) LoggerFactory.getLogger(UserControllerTest.class);
+public class LoadData {
+    private final Logger log = (Logger) LoggerFactory.getLogger(LoadData.class);
 
     @Bean
     CommandLineRunner initDatabase(UserRepository repository) throws ParseException {
