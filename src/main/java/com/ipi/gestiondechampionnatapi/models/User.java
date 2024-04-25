@@ -6,8 +6,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
+
 @Entity
-@Table(name = user)
+@Table(name = "user")
 public class User {
 
     @Id
@@ -40,19 +42,17 @@ public class User {
     @Temporal(value = TemporalType.DATE)
     @JsonFormat(pattern = "yyyy-MM-dd")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private String creationDate;
+    private LocalDate creationDate;
 
     public User() {}
 
-    public User(long id, String creationDate, String password, String email, String lastname, String firstname) {
-        this.id = id;
+    public User(LocalDate creationDate, String password, String email, String lastname, String firstname) {
         this.creationDate = creationDate;
         this.password = password;
         this.email = email;
         this.lastname = lastname;
         this.firstname = firstname;
     }
-
 
     /*
      * **********************
@@ -100,11 +100,11 @@ public class User {
         this.password = password;
     }
 
-    public String getCreationDate() {
+    public LocalDate getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(String creationDate) {
+    public void setCreationDate(LocalDate creationDate) {
         this.creationDate = creationDate;
     }
 }
