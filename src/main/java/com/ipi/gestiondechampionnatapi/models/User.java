@@ -46,6 +46,14 @@ public class User {
 
     public User() {}
 
+    /**
+     * Objet Utilisateur
+     * @param creationDate Date de création
+     * @param password Mot de passe
+     * @param email Mail de l'utilisateur
+     * @param lastname Nom
+     * @param firstname Prénom
+     */
     public User(LocalDate creationDate, String password, String email, String lastname, String firstname) {
         this.creationDate = creationDate;
         this.password = password;

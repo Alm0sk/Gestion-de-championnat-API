@@ -15,6 +15,12 @@ import java.time.LocalDate;
 public class LoadData {
     private final Logger log = LoggerFactory.getLogger(LoadData.class);
 
+    /**
+     * Initialise la database avec un utilisateur de test
+     * @param repository le référentiel d'utilisateurs utilisé pour accéder à la base de données
+     * @return instance de {@link CommandLineRunner} qui exécute l'initialisation
+     * @throws ParseException gestion d'erreur
+     */
     @Bean
     CommandLineRunner initDatabase(UserRepository repository) throws ParseException {
         log.info("Chargement des données utilisateurs");
