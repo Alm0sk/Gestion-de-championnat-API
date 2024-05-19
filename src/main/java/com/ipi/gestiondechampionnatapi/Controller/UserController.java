@@ -1,4 +1,4 @@
-package com.ipi.gestiondechampionnatapi;
+package com.ipi.gestiondechampionnatapi.Controller;
 
 import com.ipi.gestiondechampionnatapi.models.User;
 import com.ipi.gestiondechampionnatapi.repository.UserRepository;
@@ -9,16 +9,15 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.naming.Binding;
 import java.util.List;
 
 @RestController
 @RequestMapping(value ="/api/users")
-public class UserConstroller {
+public class UserController {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    public UserConstroller(UserRepository userRepository) {
+    public UserController(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -28,7 +27,7 @@ public class UserConstroller {
     @GetMapping("/ping")
     public String ping() {
 
-        return "pong";
+        return "user pong";
     }
 
     /*
@@ -52,6 +51,22 @@ public class UserConstroller {
         }
 
         return user;
+    }
+
+    /*
+     * Récupérer un utilisateur en fonction de son user et password
+     */
+    @GetMapping(value = "/getUserByEMailAndPassword")
+    public ResponseEntity<User> getUserByEMailAndPassword(@RequestParam String email, @RequestParam String password) {
+        List<User> users = userRepository.findAll()
+                .stream()
+                .filter(user -> user.getEmail().equals(email))
+                .filter(user -> user.getPassword().equals(password))
+                .toList();
+        if (users.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur introuvable");
+        }
+        return new ResponseEntity<>(users.get(0), HttpStatus.OK);
     }
 
     /*

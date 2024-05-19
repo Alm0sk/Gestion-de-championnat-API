@@ -9,7 +9,10 @@ import java.util.List;
 @Repository
 public interface UserRepository extends CrudRepository<User, Long> {
 
+    /**
+     * Affiche tous les utilisateurs
+     * @return liste de tous les utilisateurs
+     */
     @Override
     List<User> findAll();
-
 }
