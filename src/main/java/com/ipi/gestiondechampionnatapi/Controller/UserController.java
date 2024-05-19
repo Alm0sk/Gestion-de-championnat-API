@@ -82,6 +82,24 @@ public class UserController {
         }
     }
 
-
-
+    /*
+     * Mettre à jour un utilisateur
+     */
+    @PutMapping(value = "/{user}")
+    public ResponseEntity<User> updateUser(@PathVariable(name = "user", required = true) User user,
+                                           @Valid @RequestBody User userUpdate, BindingResult bindingResult) {
+        if (user == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Utilisateur introuvable"
+            );
+        } else {
+            if (bindingResult.hasErrors()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, bindingResult.toString());
+            } else {
+                userUpdate.setId(user.getId());
+                userRepository.save(userUpdate);
+                return new ResponseEntity<>(userUpdate, HttpStatus.CREATED);
+            }
+        }
+    }
 }
