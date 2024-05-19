@@ -1,4 +1,5 @@
 # Gestion-de-championnat-API
 
 Lancer la base de données :
-```docker-compose up -d```
+
+Depuis la racine du projet --> ```docker-compose up -d```
