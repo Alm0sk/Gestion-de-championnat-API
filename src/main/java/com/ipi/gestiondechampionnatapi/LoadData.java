@@ -31,7 +31,7 @@ public class LoadData {
             LocalDate dateCreation = LocalDate.parse("2024-04-02");
 
             // Création de l'objet User
-            User userTest = new User(dateCreation, "password", "test@email.fr", "toto", "test");
+            User userTest = new User(dateCreation, "password", "test@email.fr", "Dutest", "Toto");
 
             // Sauvegarde de l'utilisateur dans la base donnée
             return args -> log.info("Chargement de l'utilisateur : {}", repository.save(userTest));
