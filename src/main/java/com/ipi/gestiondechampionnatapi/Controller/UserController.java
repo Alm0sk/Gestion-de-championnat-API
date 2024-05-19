@@ -3,8 +3,10 @@ package com.ipi.gestiondechampionnatapi.Controller;
 import com.ipi.gestiondechampionnatapi.models.User;
 import com.ipi.gestiondechampionnatapi.repository.UserRepository;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -17,8 +19,11 @@ public class UserController {
 
     private final UserRepository userRepository;
 
-    public UserController(UserRepository userRepository) {
+    private final PasswordEncoder passwordEncoder;
+
+    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     /*
@@ -61,7 +66,7 @@ public class UserController {
         List<User> users = userRepository.findAll()
                 .stream()
                 .filter(user -> user.getEmail().equals(email))
-                .filter(user -> user.getPassword().equals(password))
+                .filter(user -> passwordEncoder.matches(password, user.getPasswordHash()))
                 .toList();
         if (users.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur introuvable");
@@ -77,6 +82,9 @@ public class UserController {
         if (bindingResult.hasErrors()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, bindingResult.toString());
         } else {
+            String hashedPassword = passwordEncoder.encode(user.getPasswordHash());
+            user.setPassword(hashedPassword);
+
             userRepository.save(user);
             return new ResponseEntity<>(user, HttpStatus.CREATED);
         }
@@ -97,6 +105,11 @@ public class UserController {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, bindingResult.toString());
             } else {
                 userUpdate.setId(user.getId());
+
+                if (!user.getPasswordHash().equals(userUpdate.getPasswordHash())) {
+                    String hashedPassword = passwordEncoder.encode(userUpdate.getPasswordHash());
+                    userUpdate.setPassword(hashedPassword);
+                }
                 userRepository.save(userUpdate);
                 return new ResponseEntity<>(userUpdate, HttpStatus.CREATED);
             }

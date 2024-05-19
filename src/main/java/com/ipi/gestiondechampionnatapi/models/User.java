@@ -31,11 +31,10 @@ public class User {
     @NotBlank(message = "Le champ email ne peut pas être vide")
     private String email;
 
-    // TODO : voir pour ajouter de la complexité
     @Column(name = "password")
     @NotNull(message = "Le champ password ne peut pas être null")
     @NotBlank(message = "Le champ password ne peut pas être vide")
-    private String password;
+    private String passwordHash;
 
     @Column(name = "creationDate")
     @NotNull(message = "Le champ date de création ne peut pas être null")
@@ -49,14 +48,14 @@ public class User {
     /**
      * Objet Utilisateur
      * @param creationDate Date de création
-     * @param password Mot de passe
+     * @param passwordHash Mot de passe hashé
      * @param email Mail de l'utilisateur
      * @param lastname Nom
      * @param firstname Prénom
      */
-    public User(LocalDate creationDate, String password, String email, String lastname, String firstname) {
+    public User(LocalDate creationDate, String passwordHash, String email, String lastname, String firstname) {
         this.creationDate = creationDate;
-        this.password = password;
+        this.passwordHash = passwordHash;
         this.email = email;
         this.lastname = lastname;
         this.firstname = firstname;
@@ -100,12 +99,12 @@ public class User {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
+    public String getPasswordHash() {
+        return passwordHash;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPassword(String passwordHash) {
+        this.passwordHash = passwordHash;
     }
 
     public LocalDate getCreationDate() {
