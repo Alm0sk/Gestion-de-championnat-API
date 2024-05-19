@@ -102,4 +102,20 @@ public class UserController {
             }
         }
     }
+
+    /*
+     * Supprimer un utilisateur
+     */
+    @DeleteMapping(value = "{user}")
+    public ResponseEntity<String> deleteUser(@PathVariable(name = "user", required = true) User user) {
+        if (user == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Utilisateur introuvable"
+            );
+        } else {
+            userRepository.delete(user);
+            return ResponseEntity.ok("L'utilisateur "+ user.getId() + " " + user.getEmail() + " a été supprimé avec succès");
+        }
+    }
+
 }
