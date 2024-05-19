@@ -26,7 +26,7 @@ public class User {
     @NotBlank(message = "Le champ lastname ne peut pas être vide")
     private String lastname;
 
-    @Column(name = "email")
+    @Column(name = "email", unique = true )
     @NotNull(message = "Le champ email ne peut pas être null")
     @NotBlank(message = "Le champ email ne peut pas être vide")
     private String email;
