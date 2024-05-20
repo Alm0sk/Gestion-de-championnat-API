@@ -1,7 +1,6 @@
 package com.ipi.gestiondechampionnatapi.controller;
 
 import com.ipi.gestiondechampionnatapi.models.Championship;
-import com.ipi.gestiondechampionnatapi.models.User;
 import com.ipi.gestiondechampionnatapi.repository.ChampionshipRepository;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -80,7 +79,8 @@ public class ChampionshipController {
      */
     @PutMapping(value = "/{championship}")
     public ResponseEntity<Championship> updateChampionship(@PathVariable(name = "championship", required = true) Championship championship,
-                                           @Valid @RequestBody Championship championshipUpdate, BindingResult bindingResult) {
+                                                           @Valid @RequestBody Championship championshipUpdate,
+                                                           BindingResult bindingResult) {
         if (championship == null) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "Championat introuvable"

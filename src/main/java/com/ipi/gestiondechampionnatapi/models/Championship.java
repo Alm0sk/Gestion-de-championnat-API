@@ -9,6 +9,8 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "championship")
@@ -50,6 +52,17 @@ public class Championship {
     @Column(name = "drawPoint")
     @NotNull(message = "Le champ points pour un match null du championnat ne peut pas être null")
     private int drawPoint;
+
+    @ManyToMany(fetch = FetchType.LAZY,
+            cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE
+            })
+    @JoinTable(name = "TeamChampionship",
+            joinColumns = { @JoinColumn(name = "championship_id") },
+            inverseJoinColumns = { @JoinColumn(name = "team_id") })
+    private Set<Team> teams = new HashSet<>();
+
 
     public Championship() {}
 
@@ -133,7 +146,17 @@ public class Championship {
         this.drawPoint = drawPoint;
     }
 
+    public void addTeam(Team team) {
+        this.teams.add(team);
+    }
 
+    public void removeTeam(long teamId) {
+        Team team = this.teams.stream().filter(t -> t.getId() == teamId).findFirst().orElse(null);
+        if(team != null) {
+            this.teams.remove(team);
+            team.getChampionships().remove(this);
+        }
+    }
 
 
 }

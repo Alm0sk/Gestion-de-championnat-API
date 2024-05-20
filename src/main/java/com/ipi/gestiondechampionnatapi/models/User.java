@@ -1,7 +1,6 @@
 package com.ipi.gestiondechampionnatapi.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -27,7 +26,7 @@ public class User {
     @NotBlank(message = "Le champ lastname de l'utilisateur ne peut pas être vide")
     private String lastname;
 
-    @Column(name = "email", unique = true )
+    @Column(name = "email", unique = true)
     @NotNull(message = "Le champ email de l'utilisateur ne peut pas être null")
     @NotBlank(message = "Le champ email de l'utilisateur ne peut pas être vide")
     private String email;
@@ -50,7 +49,7 @@ public class User {
      * Objet Utilisateur
      * @param creationDate date de création
      * @param passwordHash mot de passe hashé
-     * @param email mail de l'utilisateur
+     * @param email mail de l'utilisateur (unique)
      * @param lastname nom de l'utilisateur
      * @param firstname prénom de l'utilisateur
      */
