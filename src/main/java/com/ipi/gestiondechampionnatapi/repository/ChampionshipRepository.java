@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ChampionshipRepository extends CrudRepository<Championship, Integer> {
+public interface ChampionshipRepository extends CrudRepository<Championship, Long> {
 
     /**
      * Affiche tout les championnat

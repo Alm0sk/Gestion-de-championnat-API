@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value ="/api/users")
@@ -81,11 +82,19 @@ public class UserController {
         if (bindingResult.hasErrors()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, bindingResult.toString());
         } else {
-            String hashedPassword = passwordEncoder.encode(user.getPasswordHash());
-            user.setPassword(hashedPassword);
+            // Fix pour empêcher la création d'un utilisateur par-dessus un utilisateur déjà existant avec l'ID
+            Optional<User> existingUser = userRepository.findById(user.getId());
+            if(existingUser.isPresent()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Un utilisateur avec cet ID existe déjà. " +
+                        "L'id est automatiquement géré et n'est pas attendu dans cette request");
 
-            userRepository.save(user);
-            return new ResponseEntity<>(user, HttpStatus.CREATED);
+            } else {
+                String hashedPassword = passwordEncoder.encode(user.getPasswordHash());
+                user.setPassword(hashedPassword);
+
+                userRepository.save(user);
+                return new ResponseEntity<>(user, HttpStatus.CREATED);
+            }
         }
     }
 

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/api/championships")
@@ -61,8 +62,16 @@ public class ChampionshipController {
         if (bindingResult.hasErrors()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, bindingResult.toString());
         } else {
-            championshipRepository.save(championship);
-            return new ResponseEntity<>(championship, HttpStatus.CREATED);
+            // Fix pour empêcher la création d'un championnat par-dessus un championnat déjà existant avec l'ID
+            Optional<Championship> existingChampionship = championshipRepository.findById(championship.getId());
+            if(existingChampionship.isPresent()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Un championnat avec cet ID existe déjà. " +
+                        "L'id est automatiquement géré et n'est pas attendu dans cette request");
+
+            } else {
+                championshipRepository.save(championship);
+                return new ResponseEntity<>(championship, HttpStatus.CREATED);
+            }
         }
     }
 
