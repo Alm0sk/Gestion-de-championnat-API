@@ -1,6 +1,7 @@
 package com.ipi.gestiondechampionnatapi.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.ipi.gestiondechampionnatapi.tools.championships.DateRange;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -11,6 +12,7 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "championship")
+@DateRange(message = "La date de début doit être inférieur ou égale à la date de fin")
 public class Championship {
 
     @Id

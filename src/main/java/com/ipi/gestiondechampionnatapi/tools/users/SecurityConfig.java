@@ -1,4 +1,4 @@
-package com.ipi.gestiondechampionnatapi;
+package com.ipi.gestiondechampionnatapi.tools.users;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
