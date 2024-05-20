@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DateRange {
-    String message() default "La date de début doit être antérieure à la date de fin";
+    String message() default "La date de début doit être inférieur ou égale à la date de fin";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

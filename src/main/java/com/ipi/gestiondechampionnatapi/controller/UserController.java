@@ -44,7 +44,7 @@ public class UserController {
     }
 
     /*
-     * Récupérer un utilisateur
+     * Récupérer un utilisateur par son ID
      */
     @GetMapping(value = "/{user}")
     public User getOne(@PathVariable(name = "user", required = false) User user) {
