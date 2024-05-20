@@ -17,27 +17,27 @@ public class User {
     private long id;
 
     @Column(name = "firstname")
-    @NotNull(message = "Le champ firstname ne peut pas être null")
-    @NotBlank(message = "Le champ firstname ne peut pas être vide")
+    @NotNull(message = "Le champ firstname de l'utilisateur ne peut pas être null")
+    @NotBlank(message = "Le champ firstname de l'utilisateur ne peut pas être vide")
     private String firstname;
 
     @Column(name = "lastname")
-    @NotNull(message = "Le champ lastname ne peut pas être null")
-    @NotBlank(message = "Le champ lastname ne peut pas être vide")
+    @NotNull(message = "Le champ lastname de l'utilisateur ne peut pas être null")
+    @NotBlank(message = "Le champ lastname de l'utilisateur ne peut pas être vide")
     private String lastname;
 
     @Column(name = "email", unique = true )
-    @NotNull(message = "Le champ email ne peut pas être null")
-    @NotBlank(message = "Le champ email ne peut pas être vide")
+    @NotNull(message = "Le champ email de l'utilisateur ne peut pas être null")
+    @NotBlank(message = "Le champ email de l'utilisateur ne peut pas être vide")
     private String email;
 
     @Column(name = "password")
-    @NotNull(message = "Le champ password ne peut pas être null")
-    @NotBlank(message = "Le champ password ne peut pas être vide")
+    @NotNull(message = "Le champ password de l'utilisateur ne peut pas être null")
+    @NotBlank(message = "Le champ password de l'utilisateur ne peut pas être vide")
     private String passwordHash;
 
     @Column(name = "creationDate")
-    @NotNull(message = "Le champ date de création ne peut pas être null")
+    @NotNull(message = "Le champ date de création de l'utilisateur ne peut pas être null")
     @Temporal(value = TemporalType.DATE)
     @JsonFormat(pattern = "yyyy-MM-dd")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -47,11 +47,11 @@ public class User {
 
     /**
      * Objet Utilisateur
-     * @param creationDate Date de création
-     * @param passwordHash Mot de passe hashé
-     * @param email Mail de l'utilisateur
-     * @param lastname Nom
-     * @param firstname Prénom
+     * @param creationDate date de création
+     * @param passwordHash mot de passe hashé
+     * @param email mail de l'utilisateur
+     * @param lastname nom de l'utilisateur
+     * @param firstname prénom de l'utilisateur
      */
     public User(LocalDate creationDate, String passwordHash, String email, String lastname, String firstname) {
         this.creationDate = creationDate;
