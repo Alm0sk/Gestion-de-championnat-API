@@ -1,9 +1,11 @@
 package com.ipi.gestiondechampionnatapi;
 
 import com.ipi.gestiondechampionnatapi.models.Championship;
+import com.ipi.gestiondechampionnatapi.models.Day;
 import com.ipi.gestiondechampionnatapi.models.Team;
 import com.ipi.gestiondechampionnatapi.models.User;
 import com.ipi.gestiondechampionnatapi.repository.ChampionshipRepository;
+import com.ipi.gestiondechampionnatapi.repository.DayRepository;
 import com.ipi.gestiondechampionnatapi.repository.TeamRepository;
 import com.ipi.gestiondechampionnatapi.repository.UserRepository;
 import org.slf4j.Logger;
@@ -57,6 +59,7 @@ public class LoadData {
         }
     }
 
+
     /**
      * Initialise la database avec un championat de test
      * @param repository le référentiel championship utilisé pour accéder à la base de données
@@ -90,6 +93,13 @@ public class LoadData {
         }
     }
 
+
+    /**
+     * Initialise la database avec des équipes de test
+     * @param repository le référentiel Team utilisé pour accéder à la base de données
+     * @return instance de {@link CommandLineRunner} qui exécute l'initialisation
+     * @throws ParseException gestion d'erreur
+     */
     @Bean
     CommandLineRunner initDatabaseTeams(TeamRepository repository) throws ParseException {
         log.info("Chargement des données équipes");
@@ -118,6 +128,35 @@ public class LoadData {
             };
         } else {
             return args -> log.info("Données des équipe déjà chargées");
+        }
+    }
+
+
+    /**
+     * Initialise la base de données avec des jours de test
+     * @param dayRepository le référentiel Day utilisé pour accéder à la base de données
+     * @return instance de {@link CommandLineRunner} qui exécute l'initialisation
+     * @throws ParseException gestion d'erreur
+     */
+    @Bean
+    CommandLineRunner initDatabaseDays(DayRepository dayRepository) throws ParseException {
+        log.info("Chargement des données jours");
+
+        if (dayRepository.count() == 0) {
+
+            // La journée sera ajouté au premier Championnat de la liste (le championnat de test)
+            Long championshipId = 1L;
+
+            // Création de l'objet Day
+            Day dayTest = new Day(
+                    "Journée Test",
+                    championshipId
+            );
+
+            // Sauvegarde du jour dans la base de données
+            return args -> log.info("Chargement du jour : {}", dayRepository.save(dayTest));
+        } else {
+            return args -> log.info("Données jours déjà chargées");
         }
     }
 

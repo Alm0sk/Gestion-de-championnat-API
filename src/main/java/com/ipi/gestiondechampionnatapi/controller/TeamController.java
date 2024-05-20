@@ -1,6 +1,5 @@
 package com.ipi.gestiondechampionnatapi.controller;
 
-import com.ipi.gestiondechampionnatapi.models.Championship;
 import com.ipi.gestiondechampionnatapi.models.Team;
 import com.ipi.gestiondechampionnatapi.repository.ChampionshipRepository;
 import com.ipi.gestiondechampionnatapi.repository.TeamRepository;
@@ -50,9 +49,9 @@ public class TeamController {
      * Récupérer la liste des équipes suivant un Id de championnat
      */
     @GetMapping("/championship/{championshipId}")
-    public ResponseEntity<List<Team>> getAllTagsByTutorialId(@PathVariable(value = "championshipId") Long championshipId) {
+    public ResponseEntity<List<Team>> getAllTeamsByChampionshipId(@PathVariable(value = "championshipId") Long championshipId) {
         if (!championshipRepository.existsById(championshipId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pas d'équipe avec l'id : " + championshipId);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pas de championnat avec l'id : " + championshipId);
         }
 
         List<Team> teams = teamRepository.findTeamsByChampionshipId(championshipId);
@@ -60,7 +59,7 @@ public class TeamController {
     }
 
     /*
-     * Récupérer la liste des équipes par Id
+     * Récupérer une équipe par Id
      */
     @GetMapping(value = "/{team}")
     public Team getOne(@PathVariable(name = "team", required = false) Team team) {
@@ -81,7 +80,7 @@ public class TeamController {
         if (bindingResult.hasErrors()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, bindingResult.toString());
         } else {
-            // Fix pour empêcher la création d'un championnat par-dessus une équipe déjà existant avec l'ID
+            // Fix pour empêcher la création d'une équipe par-dessus une équipe déjà existant avec l'ID
             Optional<Team> existingTeam = teamRepository.findById(team.getId());
             if(existingTeam.isPresent()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Une équipe avec cet ID existe déjà. " +
