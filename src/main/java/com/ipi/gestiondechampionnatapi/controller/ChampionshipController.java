@@ -12,36 +12,57 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.Optional;
 
+
 @RestController
 @RequestMapping(value = "/api/championships")
 public class ChampionshipController {
 
+
+    /*
+     * Repository
+     */
     private final ChampionshipRepository championshipRepository;
 
+
+    /*
+     * Controller
+     */
     public ChampionshipController(ChampionshipRepository championshipRepository) {
         this.championshipRepository = championshipRepository;
     }
 
+
+    /* *********************
+     * Mapping
+     ********************* */
+
+
     /*
      * Ping de test
      */
-    @GetMapping("ping")
+
+    @GetMapping(value = "ping")
     public String ping() {
+
         return "championship pong";
     }
+
 
     /*
      * Récupérer la liste des championnats
      */
+
     @GetMapping(value = "/")
     public List<Championship> all() {
 
         return championshipRepository.findAll();
     }
 
+
     /*
      * Récupérer un championnat par son ID
      */
+
     @GetMapping(value = "/{championship}")
     public Championship getOne(@PathVariable(name = "championship", required = false) Championship championship) {
         if (championship == null) {
@@ -56,6 +77,7 @@ public class ChampionshipController {
     /*
      * Post d'un championnat
      */
+
     @PostMapping(value = "/")
     public ResponseEntity<Championship> saveChampionship(@Valid @RequestBody Championship championship, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -69,16 +91,19 @@ public class ChampionshipController {
 
             } else {
                 championshipRepository.save(championship);
+
                 return new ResponseEntity<>(championship, HttpStatus.CREATED);
             }
         }
     }
 
+
     /*
      * Mettre à jour un championnat
      */
+
     @PutMapping(value = "/{championship}")
-    public ResponseEntity<Championship> updateChampionship(@PathVariable(name = "championship", required = true) Championship championship,
+    public ResponseEntity<Championship> updateChampionship(@PathVariable(name = "championship") Championship championship,
                                                            @Valid @RequestBody Championship championshipUpdate,
                                                            BindingResult bindingResult) {
         if (championship == null) {
@@ -91,22 +116,25 @@ public class ChampionshipController {
             } else {
                 championshipUpdate.setId(championship.getId());
                 championshipRepository.save(championshipUpdate);
+
                 return new ResponseEntity<>(championshipUpdate, HttpStatus.CREATED);
             }
         }
     }
 
+
     /*
      * Supprimer un championnat
      */
     @DeleteMapping(value = "{championship}")
-    public ResponseEntity<String> deleteChampionship(@PathVariable(name = "championship", required = true) Championship championship) {
+    public ResponseEntity<String> deleteChampionship(@PathVariable(name = "championship") Championship championship) {
         if (championship == null) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "Championnat introuvable"
             );
         } else {
             championshipRepository.delete(championship);
+
             return ResponseEntity.ok("Le championnat "+ championship.getId() + " " + championship.getName() + " a été supprimé avec succès");
         }
     }

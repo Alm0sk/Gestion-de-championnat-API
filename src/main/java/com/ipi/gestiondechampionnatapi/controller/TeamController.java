@@ -4,7 +4,6 @@ import com.ipi.gestiondechampionnatapi.models.Team;
 import com.ipi.gestiondechampionnatapi.repository.ChampionshipRepository;
 import com.ipi.gestiondechampionnatapi.repository.TeamRepository;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -14,53 +13,77 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.Optional;
 
+
 @RestController
 @RequestMapping(value = "/api/teams")
 public class TeamController {
 
-    @Autowired
-    private TeamRepository teamRepository;
 
-    @Autowired
-    private ChampionshipRepository championshipRepository;
+    /*
+     * Repository
+     */
+    
+    private final TeamRepository teamRepository;
+    private final ChampionshipRepository championshipRepository;
 
-    public TeamController(TeamRepository teamRepository) {
+
+    /*
+     * Controller
+     */
+    
+    public TeamController(TeamRepository teamRepository, ChampionshipRepository championshipRepository) {
         this.teamRepository = teamRepository;
+        this.championshipRepository = championshipRepository;
     }
+
+
+    /* *********************
+     * Mapping
+     ********************* */
+
 
     /*
      * Ping de test
      */
-    @GetMapping("ping")
+    
+    @GetMapping(value = "ping")
     public String ping() {
+
         return "Team pong";
     }
+
 
     /*
      * Récupérer la liste des équipes
      */
+    
     @GetMapping(value = "/")
     public List<Team> all() {
 
         return teamRepository.findAll();
     }
 
+
     /*
      * Récupérer la liste des équipes suivant un Id de championnat
      */
-    @GetMapping("/championship/{championshipId}")
+    
+    @GetMapping(value = "/championship/{championshipId}")
     public ResponseEntity<List<Team>> getAllTeamsByChampionshipId(@PathVariable(value = "championshipId") Long championshipId) {
         if (!championshipRepository.existsById(championshipId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pas de championnat avec l'id : " + championshipId);
         }
 
         List<Team> teams = teamRepository.findTeamsByChampionshipId(championshipId);
+
         return new ResponseEntity<>(teams, HttpStatus.OK);
     }
+
 
     /*
      * Récupérer une équipe par Id
      */
+
     @GetMapping(value = "/{team}")
     public Team getOne(@PathVariable(name = "team", required = false) Team team) {
         if (team == null) {
@@ -72,9 +95,11 @@ public class TeamController {
         return team;
     }
 
+
     /*
      * Post d'une team
      */
+
     @PostMapping(value = "/")
     public ResponseEntity<Team> saveTeam(@Valid @RequestBody Team team, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -88,10 +113,12 @@ public class TeamController {
 
             } else {
                 teamRepository.save(team);
+
                 return new ResponseEntity<>(team, HttpStatus.CREATED);
             }
         }
     }
+
 
     /*
      * Ajouter une équipe à un championnat
@@ -104,16 +131,15 @@ public class TeamController {
 
             if (teamId != 0L) {
                 // Fix pour empêcher la création d'une équipe par-dessus une équipe déjà existant avec l'ID
-                Team _team = teamRepository.findById(teamId)
+                Team zteam = teamRepository.findById(teamId)
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pas d'équipe avec l'Id : " + teamId));
-                championship.addTeam(_team);
+                championship.addTeam(zteam);
                 championshipRepository.save(championship);
-                return _team;
+                return zteam;
             } else {
                 if (teamRequest.getId() != 0L && teamRepository.existsById(teamRequest.getId())) {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Une équipe avec cet ID existe déjà. L'id est automatiquement géré et n'est pas attendu dans cette request");
                 }
-
                 // Ajouter et créer une nouvelle équipe
                 championship.addTeam(teamRequest);
                 return teamRepository.save(teamRequest);
@@ -123,16 +149,18 @@ public class TeamController {
         return new ResponseEntity<>(team, HttpStatus.CREATED);
     }
 
+
     /*
      * Mettre à jour une équipe
      */
+
     @PutMapping(value = "/{team}")
-    public ResponseEntity<Team> updateTeam(@PathVariable(name = "team", required = true) Team team,
+    public ResponseEntity<Team> updateTeam(@PathVariable(name = "team") Team team,
                                            @Valid @RequestBody Team teamUpdate,
                                            BindingResult bindingResult) {
         if (team == null) {
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Equipe introuvable"
+                    HttpStatus.NOT_FOUND, "Equipe à mettre à jours introuvable"
             );
         } else {
             if (bindingResult.hasErrors()) {
@@ -140,22 +168,26 @@ public class TeamController {
             } else {
                 teamUpdate.setId(team.getId());
                 teamRepository.save(teamUpdate);
+
                 return new ResponseEntity<>(teamUpdate, HttpStatus.CREATED);
             }
         }
     }
 
+
     /*
      * Supprimer une équipe
      */
+
     @DeleteMapping(value = "{team}")
-    public ResponseEntity<String> deleteTeam(@PathVariable(name = "team", required = true) Team team) {
+    public ResponseEntity<String> deleteTeam(@PathVariable(name = "team") Team team) {
         if (team == null) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "Equipe introuvable"
             );
         } else {
             teamRepository.delete(team);
+
             return ResponseEntity.ok("L'équipe "+ team.getId() + " " + team.getName() + " a été supprimé avec succès");
         }
     }

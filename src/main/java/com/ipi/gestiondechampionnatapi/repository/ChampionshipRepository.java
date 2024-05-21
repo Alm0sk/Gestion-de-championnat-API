@@ -6,13 +6,14 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+
 @Repository
 public interface ChampionshipRepository extends CrudRepository<Championship, Long> {
 
     /**
-     * Affiche tout les championnat
      * @return liste de tous les championnats
      */
     @Override
     List<Championship> findAll();
+
 }

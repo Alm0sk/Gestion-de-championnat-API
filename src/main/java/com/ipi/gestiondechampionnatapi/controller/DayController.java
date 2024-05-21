@@ -1,10 +1,11 @@
 package com.ipi.gestiondechampionnatapi.controller;
 
 import com.ipi.gestiondechampionnatapi.models.Day;
+
 import com.ipi.gestiondechampionnatapi.repository.ChampionshipRepository;
 import com.ipi.gestiondechampionnatapi.repository.DayRepository;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -14,53 +15,76 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.Optional;
 
+
 @RestController
 @RequestMapping(value = "api/days")
 public class DayController {
 
-    @Autowired
-    private DayRepository dayRepository;
 
-    @Autowired
-    private ChampionshipRepository championshipRepository;
+    /*
+     * Repository
+     */
 
-    public DayController(DayRepository dayRepository) {
+    private final DayRepository dayRepository;
+    private final ChampionshipRepository championshipRepository;
+
+
+    /*
+     * Controller
+     */
+
+    public DayController(DayRepository dayRepository, ChampionshipRepository championshipRepository) {
         this.dayRepository = dayRepository;
+        this.championshipRepository = championshipRepository;
     }
+
+
+    /* *********************
+     * Mapping
+     ********************* */
+
 
     /*
      * Ping de test
      */
-    @GetMapping("ping")
+
+    @GetMapping(value = "ping")
     public String ping() {
+
         return "Day pong";
     }
+
 
     /*
      * Récupérer la liste des journées
      */
+
     @GetMapping(value = "/")
     public List<Day> all() {
 
         return dayRepository.findAll();
     }
 
+
     /*
      * Récupérer la liste des journées suivant un Id de championnat
      */
-    @GetMapping("/championship/{championshipId}")
+
+    @GetMapping(value = "/championship/{championshipId}")
     public ResponseEntity<List<Day>> getAllDaysByChampionshipId(@PathVariable(value = "championshipId") Long championshipId) {
         if (!championshipRepository.existsById(championshipId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pas de championnat avec l'id : " + championshipId);
         }
-
         List<Day> days = dayRepository.findDaysByChampionshipId(championshipId);
+
         return new ResponseEntity<>(days, HttpStatus.OK);
     }
+
 
     /*
      * Récupérer une journée par Id
      */
+
     @GetMapping(value = "/{day}")
     public Day getOne(@PathVariable(name = "day", required = false) Day day) {
         if (day == null) {
@@ -72,9 +96,11 @@ public class DayController {
         return day;
     }
 
+
     /*
      * Créer une journée pour un championnat
      */
+
     @PostMapping(value = "/")
     public ResponseEntity<Day> saveDay(@Valid @RequestBody Day day, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -88,21 +114,24 @@ public class DayController {
 
             } else {
                 dayRepository.save(day);
+
                 return new ResponseEntity<>(day, HttpStatus.CREATED);
             }
         }
     }
 
+
     /*
      * Mettre à jour une journée
      */
+
     @PutMapping(value = "/{day}")
-    public ResponseEntity<Day> updateDay(@PathVariable(name = "day", required = true) Day day,
+    public ResponseEntity<Day> updateDay(@PathVariable(name = "day") Day day,
                                            @Valid @RequestBody Day dayUpdate,
                                            BindingResult bindingResult) {
         if (day == null) {
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Journée introuvable"
+                    HttpStatus.NOT_FOUND, "Journée à mettre à jours introuvable"
             );
         } else {
             if (bindingResult.hasErrors()) {
@@ -110,6 +139,7 @@ public class DayController {
             } else {
                 dayUpdate.setId(day.getId());
                 dayRepository.save(dayUpdate);
+
                 return new ResponseEntity<>(dayUpdate, HttpStatus.CREATED);
             }
         }
@@ -118,15 +148,18 @@ public class DayController {
     /*
      * Supprimer une journée
      */
-    @DeleteMapping(value = "{day}")
-    public ResponseEntity<String> deleteDay(@PathVariable(name = "day", required = true) Day day) {
+
+    @DeleteMapping(value = "/{day}")
+    public ResponseEntity<String> deleteDay(@PathVariable(name = "day") Day day) {
         if (day == null) {
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Journée introuvable"
+                    HttpStatus.NOT_FOUND, "Journée à supprimer introuvable"
             );
         } else {
             dayRepository.delete(day);
+
             return ResponseEntity.ok("L'équipe "+ day.getId() + " " + day.getNumber() + " a été supprimé avec succès");
         }
     }
+
 }

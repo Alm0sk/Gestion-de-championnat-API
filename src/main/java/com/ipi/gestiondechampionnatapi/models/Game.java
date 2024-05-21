@@ -38,6 +38,14 @@ public class Game {
 
     public Game() {}
 
+    /**
+     * Objet Game
+     * @param team1Point points de l'équipe 1
+     * @param team2Point points de l'équipe 2
+     * @param team1 objet équipe 1
+     * @param team2 objet équipe 2
+     * @param day journée associée
+     */
     public Game(Integer team1Point, Integer team2Point, Team team1, Team team2, Day day) {
         this.team1Point = team1Point;
         this.team2Point = team2Point;
@@ -98,6 +106,8 @@ public class Game {
     }
 
     public Day getDay() {
+
         return day;
     }
+
 }

@@ -8,6 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
+
 @Entity
 @Table(name = "user")
 public class User {
@@ -42,6 +43,7 @@ public class User {
     @JsonFormat(pattern = "yyyy-MM-dd")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate creationDate;
+
 
     public User() {}
 
@@ -114,4 +116,5 @@ public class User {
     public void setCreationDate(LocalDate creationDate) {
         this.creationDate = creationDate;
     }
+
 }

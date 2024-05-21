@@ -15,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
+
 @RestController
 @RequestMapping(value = "api/games")
 public class GameController {
@@ -23,6 +24,7 @@ public class GameController {
     /*
      * Repository
      */
+
     private final GameRepository gameRepository;
     private final DayRepository dayRepository;
     private final TeamRepository teamRepository;
@@ -31,6 +33,7 @@ public class GameController {
     /*
      * Controller
      */
+
     public GameController(GameRepository gameRepository, DayRepository dayRepository, TeamRepository teamRepository
     ) {
         this.gameRepository = gameRepository;
@@ -48,7 +51,8 @@ public class GameController {
     /*
      * Ping de test
      */
-    @GetMapping("ping")
+
+    @GetMapping(value = "ping")
     public String ping() {
 
         return "Game pong";
@@ -58,6 +62,7 @@ public class GameController {
     /*
      * Récupérer la liste des résultats
      */
+
     @GetMapping(value = "/")
     public List<Game> all() {
 
@@ -68,6 +73,7 @@ public class GameController {
     /*
      *  Récupérer la liste des résultats suivant l’id d’un championnat
      */
+
     @GetMapping(value = "/championship/{championshipId}")
     public List<Game> getGamesByChampionship(@PathVariable Long championshipId) {
 
@@ -78,7 +84,8 @@ public class GameController {
     /*
      * Récupérer la liste des résultats suivant l’id d’une journée
      */
-    @GetMapping("/day/{dayId}")
+
+    @GetMapping(value = "/day/{dayId}")
     public ResponseEntity<List<Game>> getAllGamesByDayId(@PathVariable(value = "dayId") Long dayId) {
         if (!dayRepository.existsById(dayId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pas de journée avec l'id : " + dayId);
@@ -92,6 +99,7 @@ public class GameController {
      /*
       * Récupérer un résultat suivant son id
       */
+
      @GetMapping(value = "/{game}")
      public Game getOne(@PathVariable(name = "game", required = false) Game game) {
          if (game == null) {
@@ -107,6 +115,7 @@ public class GameController {
      /*
       * Créer un résultat pour une journée
       */
+
      @PostMapping(value = "/")
      public ResponseEntity<Game> saveGame(@Valid @RequestBody Game game, BindingResult bindingResult) {
          if (bindingResult.hasErrors()) {
@@ -121,8 +130,8 @@ public class GameController {
              game.setTeam1(team1);
              game.setTeam2(team2);
              game.setDay(day);
-
              gameRepository.save(game);
+
              return new ResponseEntity<>(game, HttpStatus.CREATED);
          }
      }
@@ -131,7 +140,8 @@ public class GameController {
      /*
       * Mettre à jour un résultat
       */
-     @PutMapping("/{gameId}")
+
+     @PutMapping(value = "/{gameId}")
      public ResponseEntity<Game> updateGame(@PathVariable Long gameId, @Valid @RequestBody Game gameUpdate, BindingResult bindingResult) {
          if (bindingResult.hasErrors()) {
              throw new ResponseStatusException(HttpStatus.BAD_REQUEST, bindingResult.toString());
@@ -161,6 +171,7 @@ public class GameController {
 
                      // Fin
                      Game updatedGame = gameRepository.save(existingGame);
+
                      return new ResponseEntity<>(updatedGame, HttpStatus.OK);
                  })
                  .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Game introuvable"));
@@ -170,8 +181,9 @@ public class GameController {
     /*
     * Supprimer une game
     */
+
     @DeleteMapping(value = "{game}")
-    public ResponseEntity<String> deleteGame(@PathVariable(name = "game", required = true) Game game) {
+    public ResponseEntity<String> deleteGame(@PathVariable(name = "game") Game game) {
         if (game == null) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "Journée introuvable"
@@ -182,4 +194,5 @@ public class GameController {
             return ResponseEntity.ok("La game "+ game.getId() + " a été supprimé avec succès");
         }
     }
+
 }

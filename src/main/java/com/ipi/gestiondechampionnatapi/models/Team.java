@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+
 @Entity
 @Table(name = "team")
 public class Team {
@@ -41,7 +42,6 @@ public class Team {
     private Set<Championship> championships = new HashSet<>();
 
 
-
     public Team() {}
 
     /**
@@ -53,6 +53,7 @@ public class Team {
         this.name = name;
         this.creationDate = creationDate;
     }
+
 
     /*
      * **********************
@@ -85,10 +86,12 @@ public class Team {
     }
 
     public Set<Championship> getChampionships() {
+
         return championships;
     }
 
     public void setChampionships(Set<Championship> championships) {
         this.championships = championships;
     }
+
 }

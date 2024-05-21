@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+
 @Entity
 @Table(name = "day")
 public class Day {
@@ -37,6 +38,7 @@ public class Day {
         this.championshipId = championshipId;
     }
 
+
     /*
      * **********************
      * GETTER & SETTER
@@ -62,6 +64,8 @@ public class Day {
     // Affichage de l'attribut championshipId dans le GET
     @JsonProperty("championshipId")
     public Long getChampionshipId() {
+
         return championshipId;
     }
+
 }

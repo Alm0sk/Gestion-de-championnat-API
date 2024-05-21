@@ -14,9 +14,7 @@ public class ChampionshipDateRange  implements ConstraintValidator<DateRange, Ch
      */
     @Override
     public boolean isValid(Championship championship , ConstraintValidatorContext context) {
-        if (championship.getStartDate() == null || championship.getEndDate() == null) {
-            return true;
-        }
+
         return !championship.getStartDate().isAfter(championship.getEndDate());
     }
 }

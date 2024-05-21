@@ -13,40 +13,61 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.Optional;
 
+
 @RestController
 @RequestMapping(value ="/api/users")
 public class UserController {
 
-    private final UserRepository userRepository;
 
+    /*
+     * Repository
+     */
+
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+
+
+    /*
+     * Controller
+     */
 
     public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
+
+    /* *********************
+     * Mapping
+     ********************* */
+
+
     /*
      * Ping de test
      */
+
     @GetMapping("/ping")
     public String ping() {
 
         return "user pong";
     }
 
+
     /*
      * Récupérer la liste des utilisateurs
      */
+
     @GetMapping(value ="/")
     public List<User> all() {
 
         return userRepository.findAll();
     }
 
+
     /*
      * Récupérer un utilisateur par son ID
      */
+
     @GetMapping(value = "/{user}")
     public User getOne(@PathVariable(name = "user", required = false) User user) {
         if (user == null) {
@@ -58,9 +79,11 @@ public class UserController {
         return user;
     }
 
+
     /*
      * Récupérer un utilisateur en fonction de son user et password
      */
+
     @GetMapping(value = "/getUserByEMailAndPassword")
     public ResponseEntity<User> getUserByEMailAndPassword(@RequestParam String email, @RequestParam String password) {
         List<User> users = userRepository.findAll()
@@ -69,14 +92,16 @@ public class UserController {
                 .filter(user -> passwordEncoder.matches(password, user.getPasswordHash()))
                 .toList();
         if (users.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur introuvable");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur introuvable avec cette ID / mot de passe");
         }
         return new ResponseEntity<>(users.get(0), HttpStatus.OK);
     }
 
+
     /*
      * Post d'un utilisateur
      */
+
     @PostMapping(value = "/")
     public ResponseEntity<User> saveUser(@Valid @RequestBody User user, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -93,20 +118,22 @@ public class UserController {
                 user.setPassword(hashedPassword);
 
                 userRepository.save(user);
+
                 return new ResponseEntity<>(user, HttpStatus.CREATED);
             }
         }
     }
 
+
     /*
      * Mettre à jour un utilisateur
      */
     @PutMapping(value = "/{user}")
-    public ResponseEntity<User> updateUser(@PathVariable(name = "user", required = true) User user,
+    public ResponseEntity<User> updateUser(@PathVariable(name = "user") User user,
                                            @Valid @RequestBody User userUpdate, BindingResult bindingResult) {
         if (user == null) {
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Utilisateur introuvable"
+                    HttpStatus.NOT_FOUND, "Utilisateur à modifier introuvable"
             );
         } else {
             if (bindingResult.hasErrors()) {
@@ -119,22 +146,26 @@ public class UserController {
                     userUpdate.setPassword(hashedPassword);
                 }
                 userRepository.save(userUpdate);
+
                 return new ResponseEntity<>(userUpdate, HttpStatus.CREATED);
             }
         }
     }
 
+
     /*
      * Supprimer un utilisateur
      */
+
     @DeleteMapping(value = "{user}")
-    public ResponseEntity<String> deleteUser(@PathVariable(name = "user", required = true) User user) {
+    public ResponseEntity<String> deleteUser(@PathVariable(name = "user") User user) {
         if (user == null) {
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Utilisateur introuvable"
+                    HttpStatus.NOT_FOUND, "Utilisateur à supprimer introuvable"
             );
         } else {
             userRepository.delete(user);
+
             return ResponseEntity.ok("L'utilisateur "+ user.getId() + " " + user.getEmail() + " a été supprimé avec succès");
         }
     }
