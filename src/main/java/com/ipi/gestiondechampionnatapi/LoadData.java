@@ -134,6 +134,7 @@ public class LoadData {
 
     /**
      * Initialise la base de données avec des jours de test
+     *
      * @param dayRepository le référentiel Day utilisé pour accéder à la base de données
      * @return instance de {@link CommandLineRunner} qui exécute l'initialisation
      * @throws ParseException gestion d'erreur
