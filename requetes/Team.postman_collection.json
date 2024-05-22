@@ -1,0 +1,405 @@
+{
+	"info": {
+		"_postman_id": "322c2928-d2b1-4e6d-928d-ce5e107c8de9",
+		"name": "Team",
+		"description": "Table équipe",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34436658",
+		"_collection_link": "https://www.postman.com/almoska/workspace/my-workspace/collection/34436658-322c2928-d2b1-4e6d-928d-ce5e107c8de9?action=share&source=collection_link&creator=34436658"
+	},
+	"item": [
+		{
+			"name": "ping",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8090/api/teams/ping",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8090",
+					"path": [
+						"api",
+						"teams",
+						"ping"
+					]
+				},
+				"description": "test de connexion"
+			},
+			"response": []
+		},
+		{
+			"name": "Get all team",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8090/api/teams/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8090",
+					"path": [
+						"api",
+						"teams",
+						""
+					]
+				},
+				"description": "Récupère toutes les équipes"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Team by championship_Id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8090/api/teams/championship/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8090",
+					"path": [
+						"api",
+						"teams",
+						"championship",
+						"1"
+					]
+				},
+				"description": "Récupère toutes les équipes pour un championnat en particulier"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Team by Id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8090/api/teams/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8090",
+					"path": [
+						"api",
+						"teams",
+						"1"
+					]
+				},
+				"description": "Récupère une équipe en fonction de son ID"
+			},
+			"response": []
+		},
+		{
+			"name": "Create team",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Nouvelle Team\",\n    \"creationDate\": \"2024-04-10\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8090/api/teams/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8090",
+					"path": [
+						"api",
+						"teams",
+						""
+					]
+				},
+				"description": "Créer une équipe"
+			},
+			"response": []
+		},
+		{
+			"name": "Create team [with ID is blocked]",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": 1,\n    \"name\": \"TeamFausse\",\n    \"creationDate\": \"2024-04-06\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8090/api/teams/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8090",
+					"path": [
+						"api",
+						"teams",
+						""
+					]
+				},
+				"description": "Créer une équipe, mais en rajoutant l'ID d'une équipe déjà existante.\n\nRetourne une bad request personalisée au lieu d'écraser l'objet existant"
+			},
+			"response": []
+		},
+		{
+			"name": "Add Team to championship",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8090/api/teams/championship/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8090",
+					"path": [
+						"api",
+						"teams",
+						"championship",
+						"1"
+					]
+				},
+				"description": "Ajoute une équipe à championnat"
+			},
+			"response": []
+		},
+		{
+			"name": "Add Team to championship [create new team]",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"TotoTeam\",\n    \"creationDate\": \"2024-04-05\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8090/api/teams/championship/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8090",
+					"path": [
+						"api",
+						"teams",
+						"championship",
+						"1"
+					]
+				},
+				"description": "Ajoute une équipe créer dans la requete à un championnat"
+			},
+			"response": []
+		},
+		{
+			"name": "Add Team to championship [team not found test]",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": 301\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8090/api/teams/championship/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8090",
+					"path": [
+						"api",
+						"teams",
+						"championship",
+						"1"
+					]
+				},
+				"description": "Tentative d'ajouter un équipe à un championnat avec une team qui n'existe pas.\n\nRetourne une bad request personalisée"
+			},
+			"response": []
+		},
+		{
+			"name": "Add Team to championship [championship not found test]",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8090/api/teams/championship/300",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8090",
+					"path": [
+						"api",
+						"teams",
+						"championship",
+						"300"
+					]
+				},
+				"description": "Tentative d'ajouter un équipe à un championnat avec un championnat qui n'existe pas.\n\nRetourne une bad request personalisée"
+			},
+			"response": []
+		},
+		{
+			"name": "Add Team to championship [create new team but ID is blocked]",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": 1,\n    \"name\": \"TataTeam\",\n    \"creationDate\": \"2024-04-05\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8090/api/teams/championship/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8090",
+					"path": [
+						"api",
+						"teams",
+						"championship",
+						"1"
+					]
+				},
+				"description": "Créer une équipe, mais en rajoutant l'ID d'une équipe déjà existante.\n\nLa bad request ne marche pas, on a un retour de création de l'objet, mais il n'est pas crée"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete team",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8090/api/teams/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8090",
+					"path": [
+						"api",
+						"teams",
+						"1"
+					]
+				},
+				"description": "Supprimer une équipe"
+			},
+			"response": []
+		}
+	]
+}
