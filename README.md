@@ -10,7 +10,7 @@ Réalisé pour les tables ci-dessous.
 Pour lancer la base de donnée Docker depuis la racine du projet : ```docker-compose up -d```
 
 
-Toute les requêtes sont disponibles via ce lien web Postman : https://www.postman.com/almoska/workspace/my-workspace.
+Toute les requêtes sont disponibles au format JSON dans le repertoire "requetes" à la racine du projet, et via ce lien web Postman : https://www.postman.com/almoska/workspace/my-workspace.
 
 ![image](https://github.com/Alvin-Kita/Gestion-de-championnat-API/assets/117522876/eeb8e8a7-f1b1-4964-a2c7-2c1ef6ab6cd3)
 
