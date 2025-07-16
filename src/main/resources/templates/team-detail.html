@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="${team.name}">Détail équipe</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 12px;
+            padding: 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+        .team-logo {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 15px;
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .team-name {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .team-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-top: 8px;
+        }
+        .content {
+            padding: 0;
+        }
+        .section {
+            margin-bottom: 0;
+        }
+        .section-header {
+            background-color: #e9ecef;
+            padding: 12px 20px;
+            border-bottom: 1px solid #dee2e6;
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .section-header:hover {
+            background-color: #dee2e6;
+        }
+        .section-content {
+            padding: 20px;
+            background-color: white;
+        }
+        .info-grid {
+            display: grid;
+            gap: 15px;
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+        }
+        .info-label {
+            font-weight: 500;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        .info-value {
+            font-weight: 600;
+            color: #2c3e50;
+            text-align: right;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .back-link:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+        .highlight-value {
+            color: #007bff;
+            font-weight: bold;
+        }
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .contact-item .icon {
+            width: 16px;
+            height: 16px;
+            color: #6c757d;
+        }
+        .website-link {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .website-link:hover {
+            text-decoration: underline;
+        }
+        .expand-icon {
+            transition: transform 0.3s ease;
+        }
+        .expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+            font-size: 0.9em;
+            background-color: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+            margin-top: 40px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 8px;
+            }
+            .header {
+                padding: 20px;
+            }
+            .team-name {
+                font-size: 24px;
+            }
+            .team-logo {
+                width: 80px;
+                height: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-link">← Retour aux championnats</a>
+    
+    <div class="container">
+        <div class="header">
+            <img th:src="${team.logo}" alt="Logo équipe" class="team-logo"/>
+            <h1 class="team-name" th:text="${team.name}">Lyon</h1>
+            <p class="team-subtitle">
+                Nom : <span th:text="${team.name}">Olympique Lyonnais</span>
+            </p>
+        </div>
+
+        <div class="content">
+            <!-- Section Administratif -->
+            <div class="section">
+                <div class="section-header" onclick="toggleSection('admin')">
+                    <span>Administratif</span>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="section-content" id="admin-content">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Fondé en :</span>
+                            <span class="info-value" th:text="${#temporals.year(team.creationDate)}">1950</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Président :</span>
+                            <span class="info-value" th:text="${team.president}">John Textor</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Entraîneur :</span>
+                            <span class="info-value highlight-value" th:text="${team.coach}">Paulo FONSECA</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Site officiel :</span>
+                            <span class="info-value">
+                                <a th:href="${team.webSite}" th:text="${team.webSite}" class="website-link" target="_blank">Lyon</a>
+                            </span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Statut :</span>
+                            <span class="info-value" th:text="${team.status}">SASP</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Siège :</span>
+                            <div class="info-value" th:text="${team.siege}">
+                                10 Avenue Simone Veil<br/>
+                                CS 70712<br/>
+                                69150 Décines-Charpieu
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Téléphone :</span>
+                            <span class="info-value contact-item">
+                                <span th:text="${team.phone}">08.92.69.69.69</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Stade -->
+            <div class="section">
+                <div class="section-header" onclick="toggleSection('stadium')">
+                    <span th:text="'Stade de ' + ${team.name}">Stade de Lyon</span>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="section-content" id="stadium-content">
+                    <div class="info-grid" th:if="${team.stadium != null}">
+                        <div class="info-item">
+                            <span class="info-label">Stade :</span>
+                            <span class="info-value" th:text="${team.stadium.name}">Groupama Stadium</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Capacité :</span>
+                            <span class="info-value" th:text="${team.stadium.capacity} + ' places'">59186 places</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Adresse du stade :</span>
+                            <div class="info-value" th:text="${team.stadium.address}">
+                                10 Avenue Simone Veil<br/>
+                                69150 Décines-Charpieu
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Tél. Stade :</span>
+                            <span class="info-value contact-item">
+                                <span th:text="${team.stadium.phone}">08.92.69.69.69</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div th:unless="${team.stadium != null}" class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Informations du stade :</span>
+                            <span class="info-value">Non disponibles</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleSection(sectionId) {
+            const content = document.getElementById(sectionId + '-content');
+            const header = content.previousElementSibling;
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                header.classList.add('expanded');
+            } else {
+                content.style.display = 'none';
+                header.classList.remove('expanded');
+            }
+        }
+        
+        // Initialiser les sections ouvertes par défaut
+        document.addEventListener('DOMContentLoaded', function() {
+            // Les sections sont ouvertes par défaut, ajouter la classe expanded
+            document.querySelectorAll('.section-header').forEach(header => {
+                header.classList.add('expanded');
+            });
+        });
+    </script>
+    <!-- Footer -->
+    <div class="footer">
+        <div class="container">
+            <p>© 2025 Gestion de Championnat - Système de gestion sportive moderne</p>
+        </div>
+    </div>
+</body>
+</html>

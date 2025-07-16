@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="${championship.name}">Championship Details</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 980px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4285f4 0%, #9c27b0 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0 0 12px 0;
+            font-size: 2.8em;
+            font-weight: 400;
+            letter-spacing: -0.5px;
+        }
+        
+        .header .season {
+            font-size: 1.2em;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        .navigation {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background-color: #fafafa;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .nav-btn {
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            font-size: 18px;
+            color: #757575;
+            cursor: pointer;
+            padding: 10px 15px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            min-width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .nav-btn:hover {
+            background-color: #f5f5f5;
+            border-color: #bdbdbd;
+            color: #424242;
+        }
+        
+        .nav-title {
+            margin: 0 25px;
+            font-size: 1.1em;
+            font-weight: 500;
+            color: #424242;
+            min-width: 200px;
+            text-align: center;
+        }
+        
+        .matches-container {
+            padding: 0;
+            min-height: 400px;
+        }
+        
+        .day-section {
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .day-header {
+            background-color: #fafafa;
+            padding: 16px 30px;
+            font-weight: 600;
+            color: #424242;
+            font-size: 0.95em;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .match {
+            display: flex;
+            align-items: center;
+            padding: 20px 30px;
+            border-bottom: 1px solid #f8f8f8;
+            transition: background-color 0.2s ease;
+        }
+        
+        .match:hover {
+            background-color: #fafafa;
+        }
+        
+        .match:last-child {
+            border-bottom: none;
+        }
+        
+        .team-home, .team-away {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            min-width: 160px;
+        }
+        
+        .team-away {
+            flex-direction: row-reverse;
+            text-align: right;
+        }
+        
+        .team-logo {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+            margin: 0 12px;
+            border-radius: 3px;
+        }
+        
+        .team-name {
+            font-weight: 500;
+            color: #424242;
+            font-size: 15px;
+        }
+        
+        .team-link {
+            text-decoration: none;
+            color: inherit;
+            transition: color 0.2s ease;
+        }
+        
+        .team-link:hover {
+            color: #4285f4;
+            text-decoration: none;
+        }
+        
+        .team-link:hover .team-name {
+            color: #4285f4;
+        }
+        
+        .score-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 75px;
+            margin: 0 20px;
+        }
+        
+        .score {
+            background-color: #424242;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 16px;
+            text-align: center;
+            min-width: 50px;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin: 20px;
+            padding: 12px 24px;
+            background-color: #4285f4;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .back-link:hover {
+            background-color: #3367d6;
+            text-decoration: none;
+        }
+        
+        .no-matches {
+            text-align: center;
+            padding: 80px 30px;
+            color: #757575;
+            font-size: 16px;
+            font-weight: 400;
+        }
+        
+        .no-matches-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+            padding: 60px 30px;
+        }
+        
+        .no-matches-icon {
+            font-size: 48px;
+            color: #e0e0e0;
+            margin-bottom: 20px;
+        }
+        
+        .no-matches-text {
+            color: #757575;
+            font-size: 16px;
+            font-weight: 400;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+            font-size: 0.9em;
+            background-color: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-link">← Retour aux championnats</a>
+    
+    <div class="container">
+        <div class="header">
+            <h1 th:text="${championship.name}">League 1</h1>
+            <div class="season">
+                Calendrier et résultats <span th:text="${championship.name}">League 1</span> 
+                <span th:text="${#temporals.year(championship.startDate)}">2024</span>-<span th:text="${#temporals.year(championship.endDate)}">2025</span>
+            </div>
+        </div>
+        
+        <div style="padding: 20px; background-color: #f8f9fa; border-bottom: 1px solid #e0e0e0; text-align: center;">
+            <a th:href="@{/championship/{id}/classement(id=${championship.id})}" 
+               style="display: inline-block; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); 
+                      color: white; padding: 12px 25px; border-radius: 6px; text-decoration: none; 
+                      font-weight: 600; transition: all 0.2s ease; margin-right: 10px;"
+               onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.2)'"
+               onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                📊 Voir le classement
+            </a>
+            <span style="color: #6c757d; font-size: 14px;">
+                • Découvrez le classement en temps réel du championnat
+            </span>
+        </div>
+        
+        <div class="navigation">
+            <button class="nav-btn">‹</button>
+            <div class="nav-title">
+                <span th:if="${not #maps.isEmpty(gamesByDay)}">
+                    <span th:with="firstDay=${gamesByDay.entrySet().iterator().next()}">
+                        <span th:text="${firstDay.key}">Journée 1</span>
+                    </span>
+                </span>
+                <span th:if="${#maps.isEmpty(gamesByDay)}">Aucun match programmé</span>
+            </div>
+            <button class="nav-btn">›</button>
+        </div>
+        
+        <div class="matches-container">
+            <div th:if="${#maps.isEmpty(gamesByDay)}" class="no-matches-container">
+                <div class="no-matches-icon">📅</div>
+                <div class="no-matches-text">Aucun match n'est encore programmé pour ce championnat.</div>
+            </div>
+            
+            <!-- Grouper les matchs par journée -->
+            <div th:each="dayEntry : ${gamesByDay}" class="day-section">
+                <div class="day-header" th:text="${dayEntry.key}">Journée 1</div>
+                
+                <div th:each="game : ${dayEntry.value}" class="match">
+                    <div class="team-home">
+                        <a th:href="@{/team/{id}(id=${game.team1.id})}" class="team-link">
+                            <div class="team-name" th:text="${game.team1.name}"></div>
+                        </a>
+                        <img th:src="${game.team1.logo}" alt="Logo" class="team-logo" 
+                             onerror="this.src='https://via.placeholder.com/32x32?text=T'"/>
+                    </div>
+                    
+                    <div class="score-container">
+                        <div class="score">
+                            <span th:text="${game.team1Point}">1</span>-<span th:text="${game.team2Point}">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="team-away">
+                        <a th:href="@{/team/{id}(id=${game.team2.id})}" class="team-link">
+                            <div class="team-name" th:text="${game.team2.name}">Reims</div>
+                        </a>
+                        <img th:src="${game.team2.logo}" alt="Logo" class="team-logo"
+                             onerror="this.src='https://via.placeholder.com/32x32?text=T'"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer -->
+    <div class="footer">
+        <div class="container">
+            <p>© 2025 Gestion de Championnat - Système de gestion sportive moderne</p>
+        </div>
+    </div>
+</body>
+</html>

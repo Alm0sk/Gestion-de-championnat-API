@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Gestion de Championnat - Accueil</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* Header Styles */
+        .main-header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            font-size: 2em;
+            color: #4285f4;
+        }
+
+        .logo-text {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #2c3e50;
+            letter-spacing: -0.5px;
+        }
+
+        .header-nav {
+            display: flex;
+            align-items: center;
+        }
+
+        .btn-backoffice {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-backoffice:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            text-decoration: none;
+            color: white;
+        }
+
+        .btn-icon {
+            font-size: 1.1em;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%);
+            color: white;
+            text-align: center;
+            padding: 60px 20px;
+            margin-bottom: 40px;
+        }
+
+        .hero-title {
+            font-size: 3.5em;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            letter-spacing: -1px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.3em;
+            opacity: 0.9;
+            font-weight: 300;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .hero-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-title {
+            font-size: 2.5em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-shadow: none;
+        }
+
+        .section-description {
+            font-size: 1.1em;
+            color: #6c757d;
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .championships-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .championship-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+        }
+
+        .championship-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .card-header {
+            position: relative;
+            height: 200px;
+            background: linear-gradient(45deg, #4285f4, #9c27b0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .card-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="1" fill="white" opacity="0.05"/><circle cx="10" cy="60" r="1" fill="white" opacity="0.1"/><circle cx="90" cy="30" r="1" fill="white" opacity="0.05"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .championship-logo {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            position: relative;
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        .championship-name {
+            font-size: 1.8em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .championship-dates {
+            color: #7f8c8d;
+            margin-bottom: 15px;
+            font-size: 0.95em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .championship-type {
+            background: linear-gradient(45deg, #e3f2fd, #f3e5f5);
+            color: #4285f4;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .card-action {
+            background: linear-gradient(45deg, #4285f4, #9c27b0);
+            color: white;
+            text-align: center;
+            padding: 15px;
+            margin: -30px -30px 0;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-action::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transition: all 0.5s ease;
+            transform: translate(-50%, -50%);
+        }
+
+        .championship-card:hover .card-action::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .stats-section {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin: 40px 0;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #4285f4;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 1em;
+            font-weight: 500;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+            font-size: 0.9em;
+            background-color: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+            margin-top: 40px;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .championship-card {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .championship-card:nth-child(1) { animation-delay: 0.1s; }
+        .championship-card:nth-child(2) { animation-delay: 0.2s; }
+        .championship-card:nth-child(3) { animation-delay: 0.3s; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5em;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.1em;
+            }
+            
+            .section-title {
+                font-size: 2em;
+            }
+            
+            .championships-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .hero-section {
+                padding: 40px 20px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .header-content {
+                padding: 12px 0;
+            }
+            
+            .logo-text {
+                font-size: 1.2em;
+            }
+            
+            .btn-backoffice {
+                padding: 10px 16px;
+                font-size: 0.9em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 15px;
+            }
+            
+            .card-body {
+                padding: 20px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Navigation -->
+    <header class="main-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-section">
+                    <span class="logo-icon">⚽</span>
+                    <span class="logo-text">Gestion de Championnat</span>
+                </div>
+                <nav class="header-nav">
+                    <a href="/login" class="btn-backoffice">
+                        <span class="btn-icon">⚙️</span>
+                        <span>Back-Office</span>
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Section Hero -->
+    <div class="hero-section">
+        <div class="container">
+            <span class="hero-icon">⚽</span>
+            <h1 class="hero-title">Gestion de Championnat</h1>
+            <p class="hero-subtitle">
+                Découvrez tous vos championnats favoris, suivez les classements en temps réel 
+                et explorez les statistiques détaillées de chaque équipe.
+            </p>
+        </div>
+    </div>
+
+    <!-- Section principale -->
+    <div class="container">
+        <!-- En-tête de section -->
+        <div class="section-header">
+            <h2 class="section-title">Championnats Disponibles</h2>
+            <p class="section-description">
+                Cliquez sur un championnat pour explorer les matchs, classements et statistiques détaillées.
+            </p>
+        </div>
+
+        <!-- Grille des championnats -->
+        <div class="championships-grid">
+            <a th:each="c : ${championships}" th:href="@{/championship/{id}(id=${c.id})}" class="championship-card">
+                <div class="card-header">
+                    <img th:src="${c.logo}" alt="Logo championnat" class="championship-logo" 
+                         onerror="this.src='https://via.placeholder.com/100x100/4285f4/ffffff?text=⚽'"/>
+                </div>
+                <div class="card-body">
+                    <h3 class="championship-name" th:text="${c.name}">League 1</h3>
+                    <div class="championship-dates">
+                        <span>📅</span>
+                        <span>
+                            Du <span th:text="${#temporals.format(c.startDate, 'd MMMM yyyy', #locale)}">1er janvier 2024</span>
+                            au <span th:text="${#temporals.format(c.endDate, 'd MMMM yyyy', #locale)}">31 décembre 2024</span>
+                        </span>
+                    </div>
+                    <div class="championship-type" th:text="${c.typeRanking}">Championnat</div>
+                </div>
+                <div class="card-action">
+                    <span>🏆 Voir le championnat</span>
+                </div>
+            </a>
+        </div>
+
+        <!-- Section statistiques -->
+        <div class="stats-section">
+            <h3 style="color: #2c3e50; font-size: 1.8em; margin-bottom: 10px;">Statistiques</h3>
+            <p style="color: #6c757d; margin-bottom: 0;">Découvrez les chiffres de nos championnats</p>
+            
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number" th:text="${championshipsCount}">2</span>
+                    <span class="stat-label">Championnats</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" th:text="${teamsCount}">20</span>
+                    <span class="stat-label">Équipes</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" th:text="${matchesCount}">40</span>
+                    <span class="stat-label">Matchs joués</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="container">
+            <p>© 2025 Gestion de Championnat - Système de gestion sportive moderne</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saisie du Résultat - Back Office</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .admin-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 0;
+            margin-bottom: 2rem;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .invalid-feedback {
+            display: block;
+        }
+        .form-label {
+            font-weight: 600;
+        }
+        .required {
+            color: #dc3545;
+        }
+        .team-display {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        .team-logo {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        .vs-display {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .score-input {
+            font-size: 2rem;
+            text-align: center;
+            font-weight: bold;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+        }
+        .score-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .match-info {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 10px;
+            padding: 1rem;
+        }
+        .championship-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <!-- En-tête Admin -->
+    <div class="admin-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="h3 mb-0">
+                        <i class="bi bi-controller"></i> 
+                        Saisie du Résultat
+                    </h1>
+                </div>
+                <div class="col-auto">
+                    <a href="/backoffice/games" class="btn btn-light btn-sm me-2">
+                        <i class="bi bi-arrow-left"></i> Retour aux matchs
+                    </a>
+                    <a href="/backoffice" class="btn btn-outline-light btn-sm me-2">
+                        <i class="bi bi-house"></i> Dashboard
+                    </a>
+                    <a href="/" class="btn btn-outline-light btn-sm">
+                        <i class="bi bi-box-arrow-right"></i> Déconnexion
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Informations du match -->
+                <div class="card mb-4" th:unless="${isNewGame}">
+                    <div class="card-body">
+                        <div class="match-info">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <img th:src="${championship?.logo}" 
+                                             th:alt="${championship?.name}"
+                                             class="team-logo me-3">
+                                        <div>
+                                            <div class="championship-badge" th:text="${championship?.name ?: 'Championnat'}"></div>
+                                            <small class="text-muted mt-2 d-block" th:if="${championship}">
+                                                <i class="bi bi-calendar"></i>
+                                                <span th:text="${#temporals.format(championship.startDate, 'dd/MM/yyyy')} + ' - ' + ${#temporals.format(championship.endDate, 'dd/MM/yyyy')}"></span>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 text-md-end">
+                                    <div class="badge bg-primary fs-6">
+                                        <i class="bi bi-flag"></i>
+                                        Journée <span th:text="${game.day.number}"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formulaire de saisie du score -->
+                <div class="card">
+                    <div class="card-header bg-white border-0 pb-0">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-primary rounded-circle p-2 me-3">
+                                <i class="bi bi-controller text-white"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-0">Saisie du résultat</h5>
+                                <small class="text-muted">Entrez les scores de chaque équipe</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <!-- Sélection des équipes et journée pour nouveau match -->
+                        <div th:if="${isNewGame}" class="mb-4">
+                            <div class="row">
+                                <!-- Sélection Journée -->
+                                <div class="col-md-12 mb-3">
+                                    <label for="daySelect" class="form-label">
+                                        <i class="bi bi-calendar-event"></i> Journée <span class="required">*</span>
+                                    </label>
+                                    <select class="form-select" id="daySelect" name="dayId" required>
+                                        <option value="">Choisir une journée...</option>
+                                        <option th:each="day : ${days}" 
+                                                th:value="${day.id}" 
+                                                th:text="'Journée ' + ${day.number} + ' - ' + ${championshipNames[day.id]}">
+                                        </option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Sélection Équipe 1 -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="team1Select" class="form-label">
+                                        <i class="bi bi-shield"></i> Équipe 1 <span class="required">*</span>
+                                    </label>
+                                    <select class="form-select" id="team1Select" name="team1Id" required>
+                                        <option value="">Choisir l'équipe 1...</option>
+                                        <option th:each="team : ${teams}" 
+                                                th:value="${team.id}" 
+                                                th:text="${team.name}">
+                                        </option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Sélection Équipe 2 -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="team2Select" class="form-label">
+                                        <i class="bi bi-shield"></i> Équipe 2 <span class="required">*</span>
+                                    </label>
+                                    <select class="form-select" id="team2Select" name="team2Id" required>
+                                        <option value="">Choisir l'équipe 2...</option>
+                                        <option th:each="team : ${teams}" 
+                                                th:value="${team.id}" 
+                                                th:text="${team.name}">
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Affichage des équipes pour modification -->
+                        <div th:unless="${isNewGame}" class="team-display">
+                            <div class="row align-items-center">
+                                <!-- Équipe 1 -->
+                                <div class="col-md-5">
+                                    <div class="text-center">
+                                        <img th:src="${game.team1.logo}" 
+                                             th:alt="${game.team1.name}"
+                                             class="team-logo mb-3">
+                                        <h4 th:text="${game.team1.name}"></h4>
+                                        <p class="text-muted mb-0">
+                                            <i class="bi bi-person"></i>
+                                            Coach: <span th:text="${game.team1.coach}"></span>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- VS -->
+                                <div class="col-md-2">
+                                    <div class="text-center">
+                                        <div class="vs-display">VS</div>
+                                    </div>
+                                </div>
+
+                                <!-- Équipe 2 -->
+                                <div class="col-md-5">
+                                    <div class="text-center">
+                                        <img th:src="${game.team2.logo}" 
+                                             th:alt="${game.team2.name}"
+                                             class="team-logo mb-3">
+                                        <h4 th:text="${game.team2.name}"></h4>
+                                        <p class="text-muted mb-0">
+                                            <i class="bi bi-person"></i>
+                                            Coach: <span th:text="${game.team2.coach}"></span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Formulaire de score -->
+                        <form th:action="@{/backoffice/games/save}" method="post" th:object="${game}">
+                            <!-- ID caché pour édition -->
+                            <input th:unless="${isNewGame}" type="hidden" th:field="*{id}">
+                            
+                            <!-- Relations cachées pour édition -->
+                            <input th:unless="${isNewGame}" type="hidden" th:field="*{team1.id}">
+                            <input th:unless="${isNewGame}" type="hidden" th:field="*{team2.id}">
+                            <input th:unless="${isNewGame}" type="hidden" th:field="*{day.id}">
+
+                            <div class="row justify-content-center mt-4">
+                                <!-- Score Équipe 1 -->
+                                <div class="col-md-4 text-center">
+                                    <label class="form-label">
+                                        <span th:if="${isNewGame}">Score Équipe 1</span>
+                                        <span th:unless="${isNewGame}">Score <span th:text="${game.team1.name}"></span></span>
+                                    </label>
+                                    <input type="number" 
+                                           class="form-control score-input" 
+                                           th:class="${#fields.hasErrors('team1Point')} ? 'form-control score-input is-invalid' : 'form-control score-input'"
+                                           id="team1Score" 
+                                           th:field="*{team1Point}" 
+                                           min="0" 
+                                           max="50"
+                                           placeholder="0">
+                                    <div th:if="${#fields.hasErrors('team1Point')}" class="invalid-feedback">
+                                        <span th:errors="*{team1Point}"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Séparateur -->
+                                <div class="col-md-1 text-center d-flex align-items-center justify-content-center">
+                                    <div class="vs-display">-</div>
+                                </div>
+
+                                <!-- Score Équipe 2 -->
+                                <div class="col-md-4 text-center">
+                                    <label class="form-label">
+                                        <span th:if="${isNewGame}">Score Équipe 2</span>
+                                        <span th:unless="${isNewGame}">Score <span th:text="${game.team2.name}"></span></span>
+                                    </label>
+                                    <input type="number" 
+                                           class="form-control score-input" 
+                                           th:class="${#fields.hasErrors('team2Point')} ? 'form-control score-input is-invalid' : 'form-control score-input'"
+                                           id="team2Score" 
+                                           th:field="*{team2Point}" 
+                                           min="0" 
+                                           max="50"
+                                           placeholder="0">
+                                    <div th:if="${#fields.hasErrors('team2Point')}" class="invalid-feedback">
+                                        <span th:errors="*{team2Point}"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Aperçu du résultat -->
+                            <div class="mt-4" id="resultPreview" style="display: none;">
+                                <div class="alert alert-info">
+                                    <div class="row text-center">
+                                        <div class="col">
+                                            <h5 class="mb-0">
+                                                <i class="bi bi-eye"></i> Aperçu du résultat
+                                            </h5>
+                                            <div id="resultDisplay" class="mt-2"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Boutons d'action -->
+                            <div class="row mt-4">
+                                <div class="col">
+                                    <div class="d-flex justify-content-between">
+                                        <a href="/backoffice/games" class="btn btn-outline-secondary">
+                                            <i class="bi bi-arrow-left"></i> Annuler
+                                        </a>
+                                        <button type="submit" class="btn btn-primary btn-lg">
+                                            <i class="bi bi-check-circle"></i>
+                                            <span th:if="${isNewGame}">Créer le match</span>
+                                            <span th:unless="${isNewGame}">Enregistrer le résultat</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <p class="mb-2">© 2024 Gestion de Championnat - Back Office</p>
+                    <div class="footer-links">
+                        <a href="/" class="text-white-50 me-3">Site Principal</a>
+                        <a href="/backoffice" class="text-white-50 me-3">Dashboard</a>
+                        <a href="/" class="text-white-50">Déconnexion</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Éléments DOM
+        const team1ScoreInput = document.getElementById('team1Score');
+        const team2ScoreInput = document.getElementById('team2Score');
+        const resultPreview = document.getElementById('resultPreview');
+        const resultDisplay = document.getElementById('resultDisplay');
+        
+        // Noms des équipes (à récupérer depuis Thymeleaf)
+        const team1Name = /*[[${game.team1?.name ?: 'Équipe 1'}]]*/ 'Équipe 1';
+        const team2Name = /*[[${game.team2?.name ?: 'Équipe 2'}]]*/ 'Équipe 2';
+
+        // Mise à jour de l'aperçu en temps réel
+        function updateResultPreview() {
+            const score1 = parseInt(team1ScoreInput.value) || 0;
+            const score2 = parseInt(team2ScoreInput.value) || 0;
+            
+            if (team1ScoreInput.value !== '' && team2ScoreInput.value !== '') {
+                let resultHtml = `
+                    <div class="h4">
+                        <span class="badge ${score1 > score2 ? 'bg-success' : score1 < score2 ? 'bg-danger' : 'bg-warning'}">${team1Name}</span>
+                        <span class="mx-3">${score1} - ${score2}</span>
+                        <span class="badge ${score2 > score1 ? 'bg-success' : score2 < score1 ? 'bg-danger' : 'bg-warning'}">${team2Name}</span>
+                    </div>
+                `;
+                
+                if (score1 > score2) {
+                    resultHtml += `<div class="text-success"><i class="bi bi-trophy"></i> Victoire de ${team1Name}</div>`;
+                } else if (score2 > score1) {
+                    resultHtml += `<div class="text-success"><i class="bi bi-trophy"></i> Victoire de ${team2Name}</div>`;
+                } else {
+                    resultHtml += `<div class="text-warning"><i class="bi bi-dash-circle"></i> Match nul</div>`;
+                }
+                
+                resultDisplay.innerHTML = resultHtml;
+                resultPreview.style.display = 'block';
+            } else {
+                resultPreview.style.display = 'none';
+            }
+        }
+
+        // Écouteurs d'événements
+        team1ScoreInput.addEventListener('input', updateResultPreview);
+        team2ScoreInput.addEventListener('input', updateResultPreview);
+
+        // Validation des scores
+        function validateScore(input) {
+            const value = parseInt(input.value);
+            if (value < 0) {
+                input.value = 0;
+            } else if (value > 50) {
+                input.value = 50;
+            }
+            updateResultPreview();
+        }
+
+        team1ScoreInput.addEventListener('change', function() {
+            validateScore(this);
+        });
+
+        team2ScoreInput.addEventListener('change', function() {
+            validateScore(this);
+        });
+
+        // Focus automatique sur le premier champ vide
+        window.addEventListener('load', function() {
+            if (!team1ScoreInput.value) {
+                team1ScoreInput.focus();
+            } else if (!team2ScoreInput.value) {
+                team2ScoreInput.focus();
+            }
+            
+            // Afficher l'aperçu si des scores sont déjà saisis
+            updateResultPreview();
+        });
+    </script>
+</body>
+</html>
