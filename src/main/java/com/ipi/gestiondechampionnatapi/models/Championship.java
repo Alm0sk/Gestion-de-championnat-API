@@ -27,6 +27,11 @@ public class Championship {
     @NotBlank(message = "Le champ nom du championnat ne peut pas être vide")
     private String name;
 
+    @Column(name = "logo")
+    @NotNull(message = "Le champ logo du championnat ne peut pas être null")
+    @NotBlank(message = "Le champ logo du championnat ne peut pas être vide")
+    private String logo;
+
     @Column(name = "startDate")
     @NotNull(message = "Le champ date de création du championnat ne peut pas être null")
     @Temporal(value = TemporalType.DATE)
@@ -54,6 +59,10 @@ public class Championship {
     @NotNull(message = "Le champ points pour un match null du championnat ne peut pas être null")
     private int drawPoint;
 
+    @Column(name = "typeRanking")
+    @NotNull(message = "Le champ type de classement du championnat ne peut pas être null")
+    private String typeRanking;
+
     @ManyToMany(fetch = FetchType.LAZY,
             cascade = {
                     CascadeType.PERSIST,
@@ -70,19 +79,23 @@ public class Championship {
     /**
      * Objet championnat
      * @param name nom du championnat
+     * @param logo logo du championnat
      * @param startDate date de début du championnat
      * @param endDate date de fin du championnat
      * @param wonPoint point attribué pour une victoire à un match
      * @param lostPoint point attribué pour une défaite à un match
      * @param drawPoint point attribué pour un match null à un match
+     * @param typeRanking type de classement du championnat
      */
-    public Championship(String name, LocalDate startDate, LocalDate endDate, int wonPoint, int lostPoint, int drawPoint) {
+    public Championship(String name, String logo, LocalDate startDate, LocalDate endDate, int wonPoint, int lostPoint, int drawPoint, String typeRanking) {
         this.name = name;
+        this.logo = logo;
         this.startDate = startDate;
         this.endDate = endDate;
         this.wonPoint = wonPoint;
         this.lostPoint = lostPoint;
         this.drawPoint = drawPoint;
+        this.typeRanking = typeRanking;
     }
 
 
@@ -107,6 +120,14 @@ public class Championship {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getLogo() {
+        return logo;
+    }
+
+    public void setLogo(String logo) {
+        this.logo = logo;
     }
 
     public LocalDate getStartDate() {
@@ -149,8 +170,20 @@ public class Championship {
         this.drawPoint = drawPoint;
     }
 
+    public String getTypeRanking() {
+        return typeRanking;
+    }
+
+    public void setTypeRanking(String typeRanking) {
+        this.typeRanking = typeRanking;
+    }
+
     public void addTeam(Team team) {
         this.teams.add(team);
+    }
+
+    public Set<Team> getTeams() {
+        return teams;
     }
 
 }

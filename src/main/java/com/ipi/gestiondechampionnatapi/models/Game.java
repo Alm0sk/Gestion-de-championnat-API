@@ -13,14 +13,12 @@ public class Game {
     private Long id;
 
     @Column(name = "team1Point")
-    @NotNull(message = "Les point ne peuvent pas être null")
     private Integer team1Point;
 
     @Column(name = "team2Point")
-    @NotNull(message = "Les point ne peuvent pas être null")
     private Integer team2Point;
 
-    @ManyToOne(fetch = FetchType.EAGER) // Trouver que le problème venait de LAZY m'aura pris du temps, je ne suis pas pret de l'oublier
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idTeam1", nullable = false)
     @NotNull
     private Team team1;
@@ -106,7 +104,6 @@ public class Game {
     }
 
     public Day getDay() {
-
         return day;
     }
 
