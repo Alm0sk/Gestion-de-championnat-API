@@ -3,12 +3,45 @@
 Gestion des requêtes API d'une application de gestion de championnat avec Spring.
 Réalisé pour les tables ci-dessous.
 
-![image](https://github.com/Alvin-Kita/Gestion-de-championnat-API/assets/117522876/9a57e53c-8b42-4df1-ae0f-a82f13535397)
+![image](assets/p2/db_model.png)
 
-# Détails
+# Lancer la base de donnée
 
-Pour lancer la base de donnée Docker depuis la racine du projet : ```docker-compose up -d```
+Pour lancer la base de donnée, il faut avoir Docker et Docker Compose installés sur votre machine
 
+Pour lancer la base de donnée Docker depuis la racine du projet : 
+
+```bash
+docker-compose up -d
+```
+
+*Pour l'arrêter :*
+
+```bash
+docker-compose down
+```
+
+Pour plus de confort lors de mes tests, j'ai ajouté phpmyadmin à la base de donnée, qui est accessible à l'adresse : [http://localhost:8081](http://localhost:8080)
+
+utilisateur : `root`<br>
+mot de passe : `my_secret_password`
+
+![image](assets/p2/phpmyadmin.png)
+
+# Lancer l'application
+
+Pour lancer l'application, il faut utiliser la commande :
+
+```bash
+mvn spring-boot:run
+```
+
+L'application est accessible ensuite à l'adresse : [http://localhost:8080](http://localhost:8080)
+
+
+# Requêtes API
+
+*L'application ayant été commencée l'année dernière pour un projet sur les API, j'ai concervé un historique de requètes API ci-dessous que je laisse à titre informatif.*
 
 Toutes les requêtes sont disponibles au format JSON dans le repertoire "requetes" à la racine du projet, et via ce lien web Postman : https://www.postman.com/almoska/workspace/my-workspace.
 
@@ -34,16 +67,4 @@ Les tentatives de créer un championnat avec une date de début après la date d
 De manière générale, j'ai essayé de faire des messages personnalisés. On peut les reconnaitre sur Postman avec la fin du titre [entre crochets]
 
 ![image](https://github.com/Alvin-Kita/Gestion-de-championnat-API/assets/117522876/90f6e139-35b5-4659-82b1-b7cc7d54878c)
-
-
-
-
-
-
-
-
-
-
-
-
 
