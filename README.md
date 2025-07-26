@@ -100,7 +100,7 @@ L'application propose une interface utilisateur moderne permettant de :
 
 Accessible à l'adresse : [http://localhost:8080/backoffice](http://localhost:8080/backoffice), cette partie de l'application est réservée aux administrateurs, et nécessite une authentification. Si l'on n'est pas authentifié, on est redirigé vers la page de connexion */login*.
 
-La class [LoadData](src/main/java/com/ipi/gestiondechampionnatapi/LoadData.java) crée un utilisateur administrateur pour les tests :
+La class LoadData crée un utilisateur administrateur pour les tests :
 
 ```java
 // Objet Date
@@ -213,13 +213,6 @@ Et bien sûr, on peux également modifier toutes les informations.
 ![Match ajouté dans le championnat](assets/p2/match_ajoute_championnat.png)
 
 ![Match ajouté classement](assets/p2/match_ajoute_classement.png)
-
-
-### Étapes à suivre
-
-1. **Créer un championnat** : Envoyer une requête POST à l'API pour créer un nouveau championnat.
-2. **Ajouter des équipes** : Pour chaque équipe, envoyer une requête POST pour l'ajouter au championnat.
-3. **Planifier des matchs** : Envoyer des requêtes POST pour créer des matchs entre les équipes du championnat.
 
 ## 🔌 Requêtes API
 
