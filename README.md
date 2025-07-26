@@ -5,7 +5,29 @@ Réalisé pour les tables ci-dessous.
 
 *Application reprise d'une ancienne version de l'application de gestion de championnat, réalisée durant la formation CDEV de l'IPI en 2023-2024*
 
-## 🛠️ Technologies utilisées
+## � Sommaire
+
+- [🛠️ Technologies utilisées](#️-technologies-utilisées)
+- [📋 Prérequis](#-prérequis)
+- [📊 Modèle de base de données](#-modèle-de-base-de-données)
+- [🚀 Installation et lancement](#-installation-et-lancement)
+  - [1. Base de données](#1-base-de-données)
+  - [Notes](#notes)
+  - [2. Lancer l'application](#2-lancer-lapplication)
+- [💻 L'application](#-lapplication)
+  - [Partie front-end](#partie-front-end)
+  - [Partie back office](#partie-back-office)
+    - [Authentification](#authentification)
+    - [Interface d'administration](#interface-dadministration)
+- [✨ Cas pratique](#-cas-pratique)
+  - [Cas pratique : Création d'un championnat](#cas-pratique--création-dun-championnat)
+  - [Cas pratique : Ajout d'équipes](#cas-pratique--ajout-déquipes)
+  - [Cas pratique : Ajout d'un match](#cas-pratique--ajout-dun-match)
+  - [Cas pratique : Conclusion](#cas-pratique--conclusion)
+- [🔌 Requêtes API](#-requêtes-api)
+- [🔒 Sécurité et validation](#-sécurité-et-validation)
+
+## �🛠️ Technologies utilisées
 
 - **Backend :** Spring Boot, Spring Security, Spring Data JPA
 - **Frontend :** Thymeleaf, Bootstrap 5, HTML/CSS
