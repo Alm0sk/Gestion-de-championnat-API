@@ -18,12 +18,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.expression.ParseException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.core.annotation.Order;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -48,6 +48,7 @@ public class LoadData {
      * @throws ParseException gestion d'erreur
      */
     @Bean
+    @Order(1)
     CommandLineRunner initDatabaseUsers(UserRepository repository) throws ParseException {
         log.info("Chargement des données utilisateurs");
 
@@ -86,6 +87,7 @@ public class LoadData {
      * @throws ParseException gestion d'erreur
      */
     @Bean
+    @Order(2)
     CommandLineRunner initDatabaseChampionships(ChampionshipRepository repository) throws ParseException {
         log.info("Chargement des données championnats");
 
@@ -137,7 +139,7 @@ public class LoadData {
      * @throws ParseException gestion d'erreur
      */
     @Bean
-    @DependsOn("initDatabaseChampionships")
+    @Order(3)
     CommandLineRunner initDatabaseTeams(TeamRepository teamRepository, ChampionshipRepository championshipRepository, TeamChampionshipService teamChampionshipService) throws ParseException {
         log.info("Chargement des données équipes");
 
@@ -443,7 +445,7 @@ public class LoadData {
      * @throws ParseException gestion d'erreur
      */
     @Bean
-    @DependsOn("initDatabaseChampionships")
+    @Order(4)
     CommandLineRunner initDatabaseDays(DayRepository dayRepository, ChampionshipRepository championshipRepository) throws ParseException {
         log.info("Chargement des données jours");
 
@@ -477,7 +479,7 @@ public class LoadData {
      * @throws ParseException gestion d'erreur
      */
     @Bean
-    @DependsOn({"initDatabaseChampionships", "initDatabaseTeams", "initDatabaseDays"})
+    @Order(5)
     CommandLineRunner initDatabaseGames(GameRepository gameRepository, TeamRepository teamRepository, DayRepository dayRepository) throws ParseException {
         log.info("Chargement des données matchs");
 
@@ -648,6 +650,7 @@ public class LoadData {
      * et permet aux équipes d'avoir plusieurs championnats à l'avenir
      */
     @Bean
+    @Order(6)
     @Transactional(readOnly = true)
     CommandLineRunner verifyTeamChampionshipAssociations(TeamRepository teamRepository, ChampionshipRepository championshipRepository) {
         return args -> {

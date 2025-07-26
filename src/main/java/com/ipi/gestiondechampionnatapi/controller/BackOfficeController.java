@@ -10,6 +10,7 @@ import com.ipi.gestiondechampionnatapi.repository.TeamRepository;
 import com.ipi.gestiondechampionnatapi.repository.GameRepository;
 import com.ipi.gestiondechampionnatapi.repository.StadiumRepository;
 import com.ipi.gestiondechampionnatapi.repository.DayRepository;
+import com.ipi.gestiondechampionnatapi.service.TeamChampionshipService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -22,6 +23,8 @@ import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.HashMap;
 
 @Controller
@@ -42,6 +45,9 @@ public class BackOfficeController {
 
     @Autowired
     private DayRepository dayRepository;
+
+    @Autowired
+    private TeamChampionshipService teamChampionshipService;
 
     /**
      * Page d'accueil du back office
@@ -196,16 +202,41 @@ public class BackOfficeController {
             stadium.ifPresent(team::setStadium);
         }
         
-        // Championnats optionnels
-        if (championshipIds != null && !championshipIds.isEmpty()) {
-            team.getChampionships().clear(); // Clear existing associations
-            for (Long championshipId : championshipIds) {
-                Optional<Championship> championship = championshipRepository.findById(championshipId);
-                championship.ifPresent(c -> team.getChampionships().add(c));
+
+        Team savedTeam = teamRepository.save(team);
+                
+        Set<Championship> currentChampionships = new HashSet<>(savedTeam.getChampionships());
+        
+        Set<Long> selectedChampionshipIds = championshipIds != null ? 
+            new HashSet<>(championshipIds) : new HashSet<>();
+        
+        for (Championship currentChampionship : currentChampionships) {
+            if (!selectedChampionshipIds.contains(currentChampionship.getId())) {
+                boolean removed = teamChampionshipService.removeTeamFromChampionship(
+                    savedTeam.getName(), currentChampionship.getName());
+                if (removed) {
+                    redirectAttributes.addFlashAttribute("info", 
+                        "Équipe retirée du championnat: " + currentChampionship.getName());
+                }
             }
         }
         
-        teamRepository.save(team);
+        if (championshipIds != null && !championshipIds.isEmpty()) {
+            for (Long championshipId : championshipIds) {
+                Optional<Championship> championship = championshipRepository.findById(championshipId);
+                if (championship.isPresent()) {
+                    boolean associated = teamChampionshipService.associateTeamToChampionship(savedTeam, championship.get());
+                    if (associated) {
+                        redirectAttributes.addFlashAttribute("info", 
+                            "Équipe associée au championnat: " + championship.get().getName());
+                    }
+                } else {
+                    redirectAttributes.addFlashAttribute("warning", 
+                        "Championnat non trouvé avec l'ID: " + championshipId);
+                }
+            }
+        }
+        
         redirectAttributes.addFlashAttribute("success", "Équipe sauvegardée avec succès !");
         return "redirect:/backoffice/teams";
     }
