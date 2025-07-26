@@ -12,6 +12,7 @@ import com.ipi.gestiondechampionnatapi.repository.GameRepository;
 import com.ipi.gestiondechampionnatapi.repository.StadiumRepository;
 import com.ipi.gestiondechampionnatapi.repository.TeamRepository;
 import com.ipi.gestiondechampionnatapi.repository.UserRepository;
+import com.ipi.gestiondechampionnatapi.service.TeamChampionshipService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -21,7 +22,6 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.annotation.PostConstruct;
 import org.springframework.expression.ParseException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -137,7 +137,8 @@ public class LoadData {
      * @throws ParseException gestion d'erreur
      */
     @Bean
-    CommandLineRunner initDatabaseTeams(TeamRepository teamRepository, ChampionshipRepository championshipRepository) throws ParseException {
+    @DependsOn("initDatabaseChampionships")
+    CommandLineRunner initDatabaseTeams(TeamRepository teamRepository, ChampionshipRepository championshipRepository, TeamChampionshipService teamChampionshipService) throws ParseException {
         log.info("Chargement des données équipes");
 
         if (teamRepository.count() == 0) {
@@ -360,19 +361,26 @@ public class LoadData {
                             "https://www." + league1Teams[i].toLowerCase().replace(" ", "") + ".fr"
                     );
                     team.setStadium(savedStadium);
+                    
+                    // Sauvegarder l'équipe d'ajouter l'association
                     Team savedTeam = teamRepository.save(team);
                     
-                    // Associer l'équipe au championnat League 1
-                    Optional<Championship> league1 = championshipRepository.findById(1L);
+                    // Associer l'équipe au championnat League 1  la sauvegarde
+                    Optional<Championship> league1 = championshipRepository.findByName("League 1");
+                    log.info("Recherche championnat League 1 pour équipe {} - trouvé: {}", 
+                            league1Teams[i], league1.isPresent());
                     if (league1.isPresent()) {
                         Championship championship = league1.get();
-                        team.getChampionships().add(championship);
-                        // Note: championship.addTeam(team) retiré pour éviter LazyInitializationException
-                        teamRepository.save(team);
-                        // Pas besoin de sauvegarder le championship car l'association est gérée par Team (owner side)
+                        
+                        boolean associated = teamChampionshipService.associateTeamToChampionship(savedTeam, championship);
+                        if (associated) {
+                            log.info("Association ajoutée: équipe {} -> championnat {}", 
+                                    league1Teams[i], championship.getName());
+                        }
                     }
                     
-                    log.info("Chargement de l'équipe League 1 : {}", savedTeam);
+                    log.info("Chargement de l'équipe League 1 : {} - Championnats associés: {}", 
+                            savedTeam.getName(), savedTeam.getChampionships().size());
                 }
 
                 // Créer les équipes pour League 2 (ID 2)
@@ -398,19 +406,26 @@ public class LoadData {
                             "https://www." + league2Teams[i].toLowerCase().replace(" ", "") + ".fr"
                     );
                     team.setStadium(savedStadium);
+                    
+                    // Sauvegarder l'équipe d'ajouter l'association
                     Team savedTeam = teamRepository.save(team);
                     
                     // Associer l'équipe au championnat League 2
-                    Optional<Championship> league2 = championshipRepository.findById(2L);
+                    Optional<Championship> league2 = championshipRepository.findByName("League 2");
+                    log.info("Recherche championnat League 2 pour équipe {} - trouvé: {}", 
+                            league2Teams[i], league2.isPresent());
                     if (league2.isPresent()) {
                         Championship championship = league2.get();
-                        team.getChampionships().add(championship);
-                        // Note: championship.addTeam(team) retiré pour éviter LazyInitializationException
-                        teamRepository.save(team);
-                        // Pas besoin de sauvegarder le championship car l'association est gérée par Team (owner side)
+                       
+                        boolean associated = teamChampionshipService.associateTeamToChampionship(savedTeam, championship);
+                        if (associated) {
+                            log.info("Association ajoutée: équipe {} -> championnat {}", 
+                                    league2Teams[i], championship.getName());
+                        }
                     }
                     
-                    log.info("Chargement de l'équipe League 2 : {}", savedTeam);
+                    log.info("Chargement de l'équipe League 2 : {} - Championnats associés: {}", 
+                            savedTeam.getName(), savedTeam.getChampionships().size());
                 }
             };
         } else {
@@ -428,6 +443,7 @@ public class LoadData {
      * @throws ParseException gestion d'erreur
      */
     @Bean
+    @DependsOn("initDatabaseChampionships")
     CommandLineRunner initDatabaseDays(DayRepository dayRepository, ChampionshipRepository championshipRepository) throws ParseException {
         log.info("Chargement des données jours");
 
@@ -627,67 +643,57 @@ public class LoadData {
     }
 
     /**
-     * Initialise les matchs après que toutes les données aient été chargées
+     * Bean pour vérifier que toutes les équipes sont bien associées à leurs championnats
+     * Note: Cette vérification utilise des requêtes spécialisées pour éviter LazyInitializationException
+     * et permet aux équipes d'avoir plusieurs championnats à l'avenir
      */
-    @PostConstruct
-    @Transactional
-    public void initGamesAfterStartup() {
-        // Utiliser un délai pour s'assurer que toutes les transactions sont commitées
-        new Thread(() -> {
-            try {
-                Thread.sleep(5000); // Attendre 5 secondes pour s'assurer que tout est chargé
-                createGamesIfNeeded();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                log.error("Erreur lors de l'attente pour créer les matchs", e);
-            }
-        }).start();
-    }
-
-    /**
-     * Crée les matchs si nécessaire
-     */
-    @Transactional
-    public void createGamesIfNeeded() {
-        if (gameRepository.count() == 0) {
-            log.info("Création des matchs...");
+    @Bean
+    @Transactional(readOnly = true)
+    CommandLineRunner verifyTeamChampionshipAssociations(TeamRepository teamRepository, ChampionshipRepository championshipRepository) {
+        return args -> {
+            log.info("=== VÉRIFICATION DES ASSOCIATIONS ÉQUIPES-CHAMPIONNATS ===");
             
-            var allTeams = teamRepository.findAll();
-            var allDays = dayRepository.findAll();
-
-            log.info("Nombre d'équipes trouvées: {}", allTeams.size());
-            log.info("Nombre de journées trouvées: {}", allDays.size());
-
-            if (allTeams.size() >= 20 && allDays.size() >= 20) {
-                // Séparer les équipes par championnat
-                var league1Teams = allTeams.subList(0, 10);
-                var league2Teams = allTeams.subList(10, 20);
-
-                // Séparer les journées par championnat
-                var league1Days = allDays.stream().filter(day -> day.getChampionshipId() == 1L).toList();
-                var league2Days = allDays.stream().filter(day -> day.getChampionshipId() == 2L).toList();
-
-                log.info("Création des matchs pour League 1: {} équipes, {} journées", league1Teams.size(), league1Days.size());
-                log.info("Création des matchs pour League 2: {} équipes, {} journées", league2Teams.size(), league2Days.size());
-
-                // Vérifier que chaque ligue a suffisamment d'équipes et de journées
-                if (league1Teams.size() >= 2 && !league1Days.isEmpty()) {
-                    createGamesForLeague(gameRepository, league1Teams, league1Days, "League 1");
-                } else {
-                    log.warn("Pas assez d'équipes ou de journées pour créer des matchs pour League 1");
+            // Compter le total d'équipes
+            long totalTeams = teamRepository.count();
+            log.info("Nombre total d'équipes dans la base: {}", totalTeams);
+            
+            // Vérifier les associations pour chaque championnat
+            var league1 = championshipRepository.findByName("League 1");
+            var league2 = championshipRepository.findByName("League 2");
+            
+            int totalAssociatedTeams = 0;
+            
+            if (league1.isPresent()) {
+                var league1Teams = teamRepository.findTeamsByChampionshipId(league1.get().getId());
+                log.info("✓ League 1 contient {} équipes:", league1Teams.size());
+                for (Team team : league1Teams) {
+                    log.info("  - {}", team.getName());
                 }
-
-                if (league2Teams.size() >= 2 && !league2Days.isEmpty()) {
-                    createGamesForLeague(gameRepository, league2Teams, league2Days, "League 2");
-                } else {
-                    log.warn("Pas assez d'équipes ou de journées pour créer des matchs pour League 2");
-                }
-                
-                log.info("Création des matchs terminée");
-            } else {
-                log.warn("Pas assez d'équipes ({}) ou de journées ({}) pour créer les matchs", allTeams.size(), allDays.size());
+                totalAssociatedTeams += league1Teams.size();
             }
-        }
+            
+            if (league2.isPresent()) {
+                var league2Teams = teamRepository.findTeamsByChampionshipId(league2.get().getId());
+                log.info("✓ League 2 contient {} équipes:", league2Teams.size());
+                for (Team team : league2Teams) {
+                    log.info("  - {}", team.getName());
+                }
+                totalAssociatedTeams += league2Teams.size();
+            }
+            
+            // Résumé final
+            log.info("=== RÉSUMÉ ===");
+            log.info("Total équipes associées: {}/{}", totalAssociatedTeams, totalTeams);
+            
+            if (totalAssociatedTeams == totalTeams) {
+                log.info("✅ Toutes les équipes sont correctement associées!");
+            } else {
+                log.warn("⚠️  {} équipes ne sont pas associées à un championnat", 
+                        totalTeams - totalAssociatedTeams);
+            }
+            
+            log.info("=== FIN DE LA VÉRIFICATION ===");
+        };
     }
 
 }

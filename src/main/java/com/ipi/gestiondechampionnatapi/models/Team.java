@@ -68,11 +68,8 @@ public class Team {
     @NotBlank(message = "Le champ site web de l'équipe ne peut pas être vide")
     private String webSite;
 
+
     @ManyToMany(fetch = FetchType.LAZY,
-        cascade = {
-            CascadeType.PERSIST,
-            CascadeType.MERGE
-        },
         mappedBy = "teams")
     @JsonIgnore
     private Set<Championship> championships = new HashSet<>();
@@ -86,16 +83,16 @@ public class Team {
     public Team() {}
 
     /**
-     * Objet équipe
-     * @param name nom de l'équipe (unique)
-     * @param creationDate date de création de l'équipe
-     * @param logo logo de l'équipe
-     * @param coach nom du coach de l'équipe
-     * @param president nom du président de l'équipe
-     * @param status statut de l'équipe
-     * @param siege siège de l'équipe
-     * @param phone numéro de téléphone de l'équipe
-     * @param webSite site web de l'équipe
+     * Team object
+     * @param name the name of the team (unique)
+     * @param creationDate the creation date of the team
+     * @param logo the logo of the team
+     * @param coach the name of the team's coach
+     * @param president the name of the team's president
+     * @param status the status of the team
+     * @param siege the headquarters of the team
+     * @param phone the phone number of the team
+     * @param webSite the website of the team
      */
     public Team(String name, LocalDate creationDate, String logo, String coach, String president, String status, String siege, String phone, String webSite) {
         this.name = name;

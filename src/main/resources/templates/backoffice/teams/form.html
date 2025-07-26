@@ -269,6 +269,24 @@
                                         Optionnel - Assignez un stade à cette équipe
                                     </div>
                                 </div>
+
+                                <!-- Championnats -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="championshipIds" class="form-label">
+                                        Championnats
+                                    </label>
+                                    <select class="form-select" id="championshipIds" name="championshipIds" multiple="multiple" size="4">
+                                        <option th:each="championship : ${championships}" 
+                                                th:value="${championship.id}" 
+                                                th:text="${championship.name} + ' (' + ${championship.startDate} + ' - ' + ${championship.endDate} + ')'"
+                                                th:selected="${team.championships != null && team.championships.contains(championship)}">
+                                        </option>
+                                    </select>
+                                    <div class="form-text">
+                                        <i class="bi bi-info-circle"></i> 
+                                        Optionnel - Maintenez Ctrl pour sélectionner plusieurs championnats
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Aperçu du logo -->

@@ -63,12 +63,8 @@ public class Championship {
     @NotNull(message = "Le champ type de classement du championnat ne peut pas être null")
     private String typeRanking;
 
-    @ManyToMany(fetch = FetchType.LAZY,
-            cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE
-            })
-    @JoinTable(name = "TeamChampionship",
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "team_championship",
             joinColumns = { @JoinColumn(name = "championship_id") },
             inverseJoinColumns = { @JoinColumn(name = "team_id") })
     protected final Set<Team> teams = new HashSet<>();

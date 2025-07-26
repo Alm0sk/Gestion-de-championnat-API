@@ -65,7 +65,7 @@ public class BackOfficeController {
      */
     @GetMapping("/championships")
     public String listChampionships(Model model) {
-        model.addAttribute("championships", championshipRepository.findAll());
+        model.addAttribute("championships", championshipRepository.findAllWithTeams());
         return "backoffice/championships/list";
     }
 
@@ -137,7 +137,7 @@ public class BackOfficeController {
      */
     @GetMapping("/teams")
     public String listTeams(Model model) {
-        model.addAttribute("teams", teamRepository.findAll());
+        model.addAttribute("teams", teamRepository.findAllWithChampionships());
         return "backoffice/teams/list";
     }
 
@@ -148,6 +148,7 @@ public class BackOfficeController {
     public String newTeam(Model model) {
         model.addAttribute("team", new Team());
         model.addAttribute("stadiums", stadiumRepository.findAll());
+        model.addAttribute("championships", championshipRepository.findAll());
         return "backoffice/teams/form";
     }
 
@@ -161,6 +162,7 @@ public class BackOfficeController {
             if (team.isPresent()) {
                 model.addAttribute("team", team.get());
                 model.addAttribute("stadiums", stadiumRepository.findAll());
+                model.addAttribute("championships", championshipRepository.findAll());
                 return "backoffice/teams/form";
             } else {
                 redirectAttributes.addFlashAttribute("error", "Équipe non trouvée avec l'ID : " + id);
@@ -179,10 +181,12 @@ public class BackOfficeController {
     public String saveTeam(@Valid @ModelAttribute Team team, 
                           BindingResult result, 
                           @RequestParam(required = false) Long stadiumId,
+                          @RequestParam(required = false) List<Long> championshipIds,
                           Model model,
                           RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
             model.addAttribute("stadiums", stadiumRepository.findAll());
+            model.addAttribute("championships", championshipRepository.findAll());
             return "backoffice/teams/form";
         }
         
@@ -190,6 +194,15 @@ public class BackOfficeController {
         if (stadiumId != null) {
             Optional<Stadium> stadium = stadiumRepository.findById(stadiumId);
             stadium.ifPresent(team::setStadium);
+        }
+        
+        // Championnats optionnels
+        if (championshipIds != null && !championshipIds.isEmpty()) {
+            team.getChampionships().clear(); // Clear existing associations
+            for (Long championshipId : championshipIds) {
+                Optional<Championship> championship = championshipRepository.findById(championshipId);
+                championship.ifPresent(c -> team.getChampionships().add(c));
+            }
         }
         
         teamRepository.save(team);
