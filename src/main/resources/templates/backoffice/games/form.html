@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>Saisie du Résultat - Back Office</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
@@ -154,53 +156,6 @@
                     </div>
 
                     <div class="card-body">
-                        <!-- Sélection des équipes et journée pour nouveau match -->
-                        <div th:if="${isNewGame}" class="mb-4">
-                            <div class="row">
-                                <!-- Sélection Journée -->
-                                <div class="col-md-12 mb-3">
-                                    <label for="daySelect" class="form-label">
-                                        <i class="bi bi-calendar-event"></i> Journée <span class="required">*</span>
-                                    </label>
-                                    <select class="form-select" id="daySelect" name="dayId" required>
-                                        <option value="">Choisir une journée...</option>
-                                        <option th:each="day : ${days}" 
-                                                th:value="${day.id}" 
-                                                th:text="'Journée ' + ${day.number} + ' - ' + ${championshipNames[day.id]}">
-                                        </option>
-                                    </select>
-                                </div>
-                                
-                                <!-- Sélection Équipe 1 -->
-                                <div class="col-md-6 mb-3">
-                                    <label for="team1Select" class="form-label">
-                                        <i class="bi bi-shield"></i> Équipe 1 <span class="required">*</span>
-                                    </label>
-                                    <select class="form-select" id="team1Select" name="team1Id" required>
-                                        <option value="">Choisir l'équipe 1...</option>
-                                        <option th:each="team : ${teams}" 
-                                                th:value="${team.id}" 
-                                                th:text="${team.name}">
-                                        </option>
-                                    </select>
-                                </div>
-                                
-                                <!-- Sélection Équipe 2 -->
-                                <div class="col-md-6 mb-3">
-                                    <label for="team2Select" class="form-label">
-                                        <i class="bi bi-shield"></i> Équipe 2 <span class="required">*</span>
-                                    </label>
-                                    <select class="form-select" id="team2Select" name="team2Id" required>
-                                        <option value="">Choisir l'équipe 2...</option>
-                                        <option th:each="team : ${teams}" 
-                                                th:value="${team.id}" 
-                                                th:text="${team.name}">
-                                        </option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
                         <!-- Affichage des équipes pour modification -->
                         <div th:unless="${isNewGame}" class="team-display">
                             <div class="row align-items-center">
@@ -243,6 +198,60 @@
 
                         <!-- Formulaire de score -->
                         <form th:action="@{/backoffice/games/save}" method="post" th:object="${game}">
+                            <!-- Sélection pour nouveau match - À L'INTÉRIEUR DU FORMULAIRE -->
+                            <div th:if="${isNewGame}" class="mb-4">
+                                <div class="row">
+                                    <!-- Sélection Journée -->
+                                    <div class="col-md-12 mb-3">
+                                        <label for="daySelect" class="form-label">
+                                            <i class="bi bi-calendar-event"></i> Journée <span class="required">*</span>
+                                        </label>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="flex-grow-1">
+                                                <select class="form-select" id="daySelect" name="dayId" required>
+                                                    <option value="">Choisir une journée...</option>
+                                                    <option th:each="day : ${days}" 
+                                                            th:value="${day.id}" 
+                                                            th:text="'Journée ' + ${day.number} + ' - ' + ${championshipNames[day.id]}">
+                                                    </option>
+                                                </select>
+                                            </div>
+                                            <button type="button" class="btn btn-outline-primary" id="createDayBtn" 
+                                                    data-bs-toggle="modal" data-bs-target="#createDayModal">
+                                                <i class="bi bi-plus-circle"></i> Créer journée
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Sélection Équipe 1 -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="team1Select" class="form-label">
+                                            <i class="bi bi-shield"></i> Équipe 1 <span class="required">*</span>
+                                        </label>
+                                        <select class="form-select" id="team1Select" name="team1Id" required>
+                                            <option value="">Choisir l'équipe 1...</option>
+                                            <option th:each="team : ${teams}" 
+                                                    th:value="${team.id}" 
+                                                    th:text="${team.name}">
+                                            </option>
+                                        </select>
+                                    </div>
+                                    
+                                    <!-- Sélection Équipe 2 -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="team2Select" class="form-label">
+                                            <i class="bi bi-shield"></i> Équipe 2 <span class="required">*</span>
+                                        </label>
+                                        <select class="form-select" id="team2Select" name="team2Id" required>
+                                            <option value="">Choisir l'équipe 2...</option>
+                                            <option th:each="team : ${teams}" 
+                                                    th:value="${team.id}" 
+                                                    th:text="${team.name}">
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
                             <!-- ID caché pour édition -->
                             <input th:unless="${isNewGame}" type="hidden" th:field="*{id}">
                             
@@ -250,7 +259,7 @@
                             <input th:unless="${isNewGame}" type="hidden" th:field="*{team1.id}">
                             <input th:unless="${isNewGame}" type="hidden" th:field="*{team2.id}">
                             <input th:unless="${isNewGame}" type="hidden" th:field="*{day.id}">
-
+                            
                             <div class="row justify-content-center mt-4">
                                 <!-- Score Équipe 1 -->
                                 <div class="col-md-4 text-center">
@@ -358,9 +367,32 @@
         const resultPreview = document.getElementById('resultPreview');
         const resultDisplay = document.getElementById('resultDisplay');
         
-        // Noms des équipes (à récupérer depuis Thymeleaf)
-        const team1Name = /*[[${game.team1?.name ?: 'Équipe 1'}]]*/ 'Équipe 1';
-        const team2Name = /*[[${game.team2?.name ?: 'Équipe 2'}]]*/ 'Équipe 2';
+        // Noms des équipes (à récupérer depuis Thymeleaf ou depuis les selects)
+        let team1Name = /*[[${game.team1?.name ?: 'Équipe 1'}]]*/ 'Équipe 1';
+        let team2Name = /*[[${game.team2?.name ?: 'Équipe 2'}]]*/ 'Équipe 2';
+        
+        // Fonction pour mettre à jour les noms des équipes (pour nouveau match)
+        function updateTeamNames() {
+            const isNewGame = /*[[${isNewGame}]]*/ false;
+            if (isNewGame) {
+                const team1Select = document.getElementById('team1Select');
+                const team2Select = document.getElementById('team2Select');
+                
+                if (team1Select && team1Select.selectedOptions.length > 0) {
+                    const selectedOption = team1Select.selectedOptions[0];
+                    if (selectedOption.value) {
+                        team1Name = selectedOption.text;
+                    }
+                }
+                
+                if (team2Select && team2Select.selectedOptions.length > 0) {
+                    const selectedOption = team2Select.selectedOptions[0];
+                    if (selectedOption.value) {
+                        team2Name = selectedOption.text;
+                    }
+                }
+            }
+        }
 
         // Mise à jour de l'aperçu en temps réel
         function updateResultPreview() {
@@ -424,6 +456,227 @@
             
             // Afficher l'aperçu si des scores sont déjà saisis
             updateResultPreview();
+        });
+    </script>
+
+    <!-- Modal de création de journée -->
+    <div class="modal fade" id="createDayModal" tabindex="-1" aria-labelledby="createDayModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createDayModalLabel">
+                        <i class="bi bi-calendar-plus"></i> Créer une nouvelle journée
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createDayForm">
+                        <div class="mb-3">
+                            <label for="newDayChampionship" class="form-label">
+                                <i class="bi bi-trophy"></i> Championnat <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" id="newDayChampionship" name="championshipId" required>
+                                <option value="">Choisir un championnat...</option>
+                                <option th:each="championship : ${championships}" 
+                                        th:value="${championship.id}" 
+                                        th:text="${championship.name}">
+                                </option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newDayNumber" class="form-label">
+                                <i class="bi bi-hash"></i> Nom/Numéro de la journée <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="newDayNumber" name="number" 
+                                   placeholder="Ex: Journée 11 - League 1" required>
+                            <div class="form-text">
+                                <i class="bi bi-info-circle"></i> Exemple : "Journée 11 - League 1" ou "Phase finale"
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Annuler
+                    </button>
+                    <button type="button" class="btn btn-primary" id="saveDayBtn">
+                        <i class="bi bi-check-circle"></i> Créer la journée
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Synchronisation des valeurs des selects avec les champs cachés pour nouveau match
+        document.addEventListener('DOMContentLoaded', function() {
+            const isNewGame = /*[[${isNewGame}]]*/ false;
+            
+            if (isNewGame) {
+                const daySelect = document.getElementById('daySelect');
+                const team1Select = document.getElementById('team1Select');
+                const team2Select = document.getElementById('team2Select');
+                
+                // Simple validation des équipes différentes
+                function validateTeams() {
+                    if (team1Select.value && team2Select.value && team1Select.value === team2Select.value) {
+                        team2Select.setCustomValidity('Les deux équipes doivent être différentes');
+                    } else {
+                        team2Select.setCustomValidity('');
+                    }
+                    updateTeamNames();
+                    updateResultPreview();
+                }
+                
+                if (team1Select && team2Select) {
+                    team1Select.addEventListener('change', validateTeams);
+                    team2Select.addEventListener('change', validateTeams);
+                }
+                
+                if (daySelect) {
+                    daySelect.addEventListener('change', function() {
+                        updateTeamNames();
+                        updateResultPreview();
+                    });
+                }
+            }
+        });
+        
+        // Gestion de la création de journée
+        document.getElementById('saveDayBtn').addEventListener('click', function() {
+            const form = document.getElementById('createDayForm');
+            const formData = new FormData(form);
+            
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            // Afficher le loading
+            this.innerHTML = '<i class="bi bi-hourglass-split"></i> Création...';
+            this.disabled = true;
+            
+            // Récupérer le token CSRF
+            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+            
+            // Envoyer la requête pour créer la journée
+            fetch('/backoffice/days/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    [csrfHeader]: csrfToken
+                },
+                body: JSON.stringify({
+                    number: formData.get('number'),
+                    championshipId: parseInt(formData.get('championshipId'))
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erreur lors de la création de la journée');
+                }
+                return response.json();
+            })
+            .then(newDay => {
+                // Ajouter la nouvelle journée dans le select
+                const daySelect = document.getElementById('daySelect');
+                const option = document.createElement('option');
+                option.value = newDay.id;
+                option.text = newDay.number + ' - ' + getChampionshipName(newDay.championshipId);
+                daySelect.appendChild(option);
+                
+                // Sélectionner la nouvelle journée
+                daySelect.value = newDay.id;
+                
+                // Fermer le modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('createDayModal'));
+                modal.hide();
+                
+                // Réinitialiser le formulaire
+                form.reset();
+                
+                // Afficher un message de succès
+                showAlert('Journée créée avec succès !', 'success');
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                showAlert('Erreur lors de la création de la journée', 'danger');
+            })
+            .finally(() => {
+                // Restaurer le bouton
+                this.innerHTML = '<i class="bi bi-check-circle"></i> Créer la journée';
+                this.disabled = false;
+            });
+        });
+        
+        // Fonction utilitaire pour obtenir le nom du championnat
+        function getChampionshipName(championshipId) {
+            const championshipSelect = document.getElementById('newDayChampionship');
+            const option = championshipSelect.querySelector(`option[value="${championshipId}"]`);
+            return option ? option.text : '';
+        }
+        
+        // Fonction utilitaire pour afficher des alertes
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            document.body.appendChild(alertDiv);
+            
+            // Supprimer l'alerte après 5 secondes
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        }
+        
+        // Débogage de la soumission du formulaire (uniquement sur la page du formulaire)
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('gameForm');
+            if (form) {
+                console.log('✅ Formulaire gameForm trouvé, ajout du débogage...');
+                
+                form.addEventListener('submit', function(e) {
+                    console.log('=== DÉBOGAGE FORMULAIRE ===');
+                    
+                    const daySelect = document.getElementById('daySelect');
+                    const team1Select = document.getElementById('team1Select');
+                    const team2Select = document.getElementById('team2Select');
+                    
+                    console.log('Valeur du champ journée:', daySelect ? daySelect.value : 'non trouvé');
+                    console.log('Valeur du champ équipe 1:', team1Select ? team1Select.value : 'non trouvé');
+                    console.log('Valeur du champ équipe 2:', team2Select ? team2Select.value : 'non trouvé');
+                    
+                    // Vérifier si les champs sont bien dans le formulaire
+                    console.log('Champ journée dans le formulaire:', form.contains(daySelect));
+                    console.log('Champ équipe 1 dans le formulaire:', form.contains(team1Select));
+                    console.log('Champ équipe 2 dans le formulaire:', form.contains(team2Select));
+                    
+                    // Afficher toutes les données du formulaire
+                    const formData = new FormData(form);
+                    console.log('=== DONNÉES DU FORMULAIRE ===');
+                    for (let [key, value] of formData.entries()) {
+                        console.log(key, ':', value);
+                    }
+                    
+                    // Si des valeurs importantes sont manquantes, empêcher la soumission pour déboguer
+                    if (!daySelect || !daySelect.value || !team1Select || !team1Select.value || !team2Select || !team2Select.value) {
+                        console.log('⚠️ VALEURS MANQUANTES - Arrêt pour débogage');
+                        e.preventDefault();
+                        showAlert('Valeurs manquantes détectées. Vérifiez la console.', 'warning');
+                        return false;
+                    }
+                });
+            } else {
+                console.log('ℹ️ Pas de formulaire gameForm sur cette page, débogage ignoré.');
+            }
         });
     </script>
 </body>

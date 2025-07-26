@@ -10,9 +10,10 @@ import com.ipi.gestiondechampionnatapi.repository.TeamRepository;
 import com.ipi.gestiondechampionnatapi.repository.GameRepository;
 import com.ipi.gestiondechampionnatapi.repository.StadiumRepository;
 import com.ipi.gestiondechampionnatapi.repository.DayRepository;
-import com.ipi.gestiondechampionnatapi.service.TeamChampionshipService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -20,12 +21,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
-import java.util.List;
-import java.util.Optional;
-import java.util.Map;
-import java.util.Set;
-import java.util.HashSet;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/backoffice")
@@ -45,9 +46,6 @@ public class BackOfficeController {
 
     @Autowired
     private DayRepository dayRepository;
-
-    @Autowired
-    private TeamChampionshipService teamChampionshipService;
 
     /**
      * Page d'accueil du back office
@@ -212,12 +210,13 @@ public class BackOfficeController {
         
         for (Championship currentChampionship : currentChampionships) {
             if (!selectedChampionshipIds.contains(currentChampionship.getId())) {
-                boolean removed = teamChampionshipService.removeTeamFromChampionship(
-                    savedTeam.getName(), currentChampionship.getName());
-                if (removed) {
-                    redirectAttributes.addFlashAttribute("info", 
-                        "Équipe retirée du championnat: " + currentChampionship.getName());
-                }
+                // Suppression de l'association équipe-championnat
+                currentChampionship.getTeams().remove(savedTeam);
+                savedTeam.getChampionships().remove(currentChampionship);
+                championshipRepository.save(currentChampionship);
+                teamRepository.save(savedTeam);
+                redirectAttributes.addFlashAttribute("info", 
+                    "Équipe retirée du championnat: " + currentChampionship.getName());
             }
         }
         
@@ -225,11 +224,15 @@ public class BackOfficeController {
             for (Long championshipId : championshipIds) {
                 Optional<Championship> championship = championshipRepository.findById(championshipId);
                 if (championship.isPresent()) {
-                    boolean associated = teamChampionshipService.associateTeamToChampionship(savedTeam, championship.get());
-                    if (associated) {
-                        redirectAttributes.addFlashAttribute("info", 
-                            "Équipe associée au championnat: " + championship.get().getName());
+                    // Association équipe-championnat
+                    if (!championship.get().getTeams().contains(savedTeam)) {
+                        championship.get().getTeams().add(savedTeam);
+                        savedTeam.getChampionships().add(championship.get());
+                        championshipRepository.save(championship.get());
+                        teamRepository.save(savedTeam);
                     }
+                    redirectAttributes.addFlashAttribute("info", 
+                        "Équipe associée au championnat: " + championship.get().getName());
                 } else {
                     redirectAttributes.addFlashAttribute("warning", 
                         "Championnat non trouvé avec l'ID: " + championshipId);
@@ -310,6 +313,7 @@ public class BackOfficeController {
             Game game = new Game();
             List<Team> teams = teamRepository.findAll();
             List<Day> days = dayRepository.findAll();
+            List<Championship> championships = championshipRepository.findAll();
             
             // List pour associer les journée avec les noms des championnats
             Map<Long, String> championshipNames = new HashMap<>();
@@ -323,6 +327,7 @@ public class BackOfficeController {
             model.addAttribute("game", game);
             model.addAttribute("teams", teams);
             model.addAttribute("days", days);
+            model.addAttribute("championships", championships);
             model.addAttribute("championshipNames", championshipNames);
             model.addAttribute("isNewGame", true);
             
@@ -344,10 +349,9 @@ public class BackOfficeController {
                           BindingResult result, 
                           Model model,
                           RedirectAttributes redirectAttributes) {
-        
+                
         // Cas : nouveau match
-        boolean isNewGame = (game.getId() == null);
-        
+        boolean isNewGame = (game.getId() == null);        
         if (isNewGame) {
             // Validation que les IDs sont fournis
             if (team1Id == null || team2Id == null || dayId == null) {
@@ -422,6 +426,45 @@ public class BackOfficeController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Erreur lors de la sauvegarde : " + e.getMessage());
             return "redirect:/backoffice/games";
+        }
+    }
+
+    // ================================
+    // GESTION DES JOURNÉES (pour création depuis formulaire match)
+    // ================================
+
+    /**
+     * Création d'une journée via Ajax
+     */
+    @PostMapping("/days/create")
+    @ResponseBody
+    public ResponseEntity<?> createDay(@RequestBody Day day) {
+        try {
+            // Validation des champs obligatoires
+            if (day.getNumber() == null || day.getNumber().trim().isEmpty()) {
+                return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Le nom de la journée est obligatoire"));
+            }
+            
+            if (day.getChampionshipId() == null) {
+                return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Le championnat est obligatoire"));
+            }
+            
+            // Vérifier que le championnat existe
+            if (!championshipRepository.existsById(day.getChampionshipId())) {
+                return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Le championnat spécifié n'existe pas"));
+            }
+            
+            // Sauvegarder la journée
+            Day savedDay = dayRepository.save(day);
+            
+            return ResponseEntity.ok(savedDay);
+            
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "Erreur lors de la création de la journée : " + e.getMessage()));
         }
     }
 }

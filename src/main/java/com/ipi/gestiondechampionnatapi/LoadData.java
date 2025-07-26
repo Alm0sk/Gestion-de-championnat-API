@@ -12,13 +12,14 @@ import com.ipi.gestiondechampionnatapi.repository.GameRepository;
 import com.ipi.gestiondechampionnatapi.repository.StadiumRepository;
 import com.ipi.gestiondechampionnatapi.repository.TeamRepository;
 import com.ipi.gestiondechampionnatapi.repository.UserRepository;
-import com.ipi.gestiondechampionnatapi.service.TeamChampionshipService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.expression.ParseException;
@@ -140,7 +141,7 @@ public class LoadData {
      */
     @Bean
     @Order(3)
-    CommandLineRunner initDatabaseTeams(TeamRepository teamRepository, ChampionshipRepository championshipRepository, TeamChampionshipService teamChampionshipService) throws ParseException {
+    CommandLineRunner initDatabaseTeams(TeamRepository teamRepository, ChampionshipRepository championshipRepository) throws ParseException {
         log.info("Chargement des données équipes");
 
         if (teamRepository.count() == 0) {
@@ -368,17 +369,25 @@ public class LoadData {
                     Team savedTeam = teamRepository.save(team);
                     
                     // Associer l'équipe au championnat League 1  la sauvegarde
-                    Optional<Championship> league1 = championshipRepository.findByName("League 1");
+                    List<Championship> leagues = championshipRepository.findAllWithTeams();
+                    Optional<Championship> league1 = leagues.stream()
+                            .filter(c -> "League 1".equals(c.getName()))
+                            .findFirst();
                     log.info("Recherche championnat League 1 pour équipe {} - trouvé: {}", 
                             league1Teams[i], league1.isPresent());
                     if (league1.isPresent()) {
                         Championship championship = league1.get();
                         
-                        boolean associated = teamChampionshipService.associateTeamToChampionship(savedTeam, championship);
-                        if (associated) {
-                            log.info("Association ajoutée: équipe {} -> championnat {}", 
-                                    league1Teams[i], championship.getName());
+                        // Association directe équipe-championnat
+                        if (!championship.getTeams().contains(savedTeam)) {
+                            championship.getTeams().add(savedTeam);
+                            savedTeam.getChampionships().add(championship);
+                            championshipRepository.save(championship);
+                            teamRepository.save(savedTeam);
+                            log.info("Association créée: {} -> {}", savedTeam.getName(), championship.getName());
                         }
+                        log.info("Association ajoutée: équipe {} -> championnat {}", 
+                                league1Teams[i], championship.getName());
                     }
                     
                     log.info("Chargement de l'équipe League 1 : {} - Championnats associés: {}", 
@@ -413,17 +422,25 @@ public class LoadData {
                     Team savedTeam = teamRepository.save(team);
                     
                     // Associer l'équipe au championnat League 2
-                    Optional<Championship> league2 = championshipRepository.findByName("League 2");
+                    List<Championship> leagues = championshipRepository.findAllWithTeams();
+                    Optional<Championship> league2 = leagues.stream()
+                            .filter(c -> "League 2".equals(c.getName()))
+                            .findFirst();
                     log.info("Recherche championnat League 2 pour équipe {} - trouvé: {}", 
                             league2Teams[i], league2.isPresent());
                     if (league2.isPresent()) {
                         Championship championship = league2.get();
                        
-                        boolean associated = teamChampionshipService.associateTeamToChampionship(savedTeam, championship);
-                        if (associated) {
-                            log.info("Association ajoutée: équipe {} -> championnat {}", 
-                                    league2Teams[i], championship.getName());
+                        // Association directe équipe-championnat
+                        if (!championship.getTeams().contains(savedTeam)) {
+                            championship.getTeams().add(savedTeam);
+                            savedTeam.getChampionships().add(championship);
+                            championshipRepository.save(championship);
+                            teamRepository.save(savedTeam);
+                            log.info("Association créée: {} -> {}", savedTeam.getName(), championship.getName());
                         }
+                        log.info("Association ajoutée: équipe {} -> championnat {}", 
+                                league2Teams[i], championship.getName());
                     }
                     
                     log.info("Chargement de l'équipe League 2 : {} - Championnats associés: {}", 
